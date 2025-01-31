@@ -82,9 +82,9 @@
 
         <div class="wallet-info">
             {% if address %}
-                <a href="/wallet_balance/{{ address }}">Check Wallet Balance</a>
+                <a href="/wallet_balance/{{ address }}" class="button-link">Check Wallet Balance</a>
             {% else %}
-                <span>Please create a wallet first to check balance.</span>
+                <span class="button-link">Please create a wallet first to check balance.</span>
             {% endif %}
         </div>
     </div>
@@ -94,4 +94,5 @@
     </div>
 </body>
 </html>
+
 
