@@ -3,25 +3,95 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Litecoin Wallet</title>
+    <title>Crypto Vault India</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #f7f7f7;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+        header {
+            background-color: #333;
+            color: white;
+            padding: 20px 0;
+            font-size: 24px;
+        }
+        h1 {
+            margin: 20px 0;
+            color: #4CAF50;
+            font-size: 36px;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin-top: 40px;
+        }
+        .button-link {
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            padding: 15px 30px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-size: 18px;
+            width: 60%;
+            max-width: 300px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s;
+        }
+        .button-link:hover {
+            background-color: #45a049;
+        }
+        .wallet-info {
+            color: #333;
+            margin-top: 20px;
+            font-size: 18px;
+        }
+        .wallet-info a {
+            color: #4CAF50;
+            text-decoration: none;
+        }
+        .wallet-info a:hover {
+            text-decoration: underline;
+        }
+        .footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background-color: #333;
+            color: white;
+            padding: 10px;
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
-    <h1>Welcome to the Crypto Vault India</h1>
-    
-    <div>
-        <h2><a href="/create_wallet">Create Wallet</a></h2>
+    <header>
+        Crypto Vault India
+    </header>
+
+    <h1>Welcome to Crypto Vault India</h1>
+
+    <div class="container">
+        <a href="/create_wallet" class="button-link">Create Wallet</a>
+        <a href="/send" class="button-link">Send Litecoin</a>
+
+        <div class="wallet-info">
+            {% if address %}
+                <a href="/wallet_balance/{{ address }}">Check Wallet Balance</a>
+            {% else %}
+                <span>Please create a wallet first to check balance.</span>
+            {% endif %}
+        </div>
     </div>
 
-    <div>
-        <h2><a href="/send">Send Litecoin</a></h2>
-    </div>
-
-    <div>
-        {% if address %}
-        <h2><a href="/wallet_balance/{{ address }}">Check Wallet Balance</a></h2>
-        {% else %}
-        <h2><a href="#">Check Wallet Balance</a> (Please create a wallet first)</h2>
-        {% endif %}
+    <div class="footer">
+        &copy; 2025 Crypto Vault India
     </div>
 </body>
 </html>
+
