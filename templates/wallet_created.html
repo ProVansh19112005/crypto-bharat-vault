@@ -5,10 +5,76 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Wallet Created - Crypto Vault India</title>
     <style>
-        /* Your styles here */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f7f7f7;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+        header {
+            background-color: #333;
+            color: white;
+            padding: 20px 0;
+            font-size: 24px;
+        }
+        h2 {
+            font-size: 36px;
+            color: #4CAF50;
+            margin-top: 50px;
+        }
+        .container {
+            background-color: white;
+            width: 80%;
+            max-width: 500px;
+            margin: 30px auto;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .message {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .litecoin-address {
+            font-size: 16px;
+            color: #555;
+            background-color: #f1f1f1;
+            padding: 10px;
+            border-radius: 5px;
+            word-wrap: break-word;
+            max-width: 90%;
+            margin: 10px auto;
+            display: block;
+        }
+        .button-link {
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            padding: 12px 25px;
+            margin-top: 20px;
+            border-radius: 5px;
+            font-size: 18px;
+            display: inline-block;
+            transition: background-color 0.3s;
+        }
+        .button-link:hover {
+            background-color: #45a049;
+        }
+        .footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background-color: #333;
+            color: white;
+            padding: 10px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
+
     <header>
         Crypto Vault India
     </header>
@@ -17,14 +83,17 @@
 
     <div class="container">
         <p class="message">Your new wallet has been created successfully! You can now start using it.</p>
-        <p>Your Litecoin address is: <strong>{{ user.litecoin_address }}</strong></p>
-        <p><a href="/index" style="color: #4CAF50;">Go back to home</a></p>
+        <p>Your Litecoin address is:</p>
+        <p class="litecoin-address">{{ user.litecoin_address }}</p>
+        <a href="/index" class="button-link">Go back to home</a>
     </div>
 
     <div class="footer">
         &copy; 2025 Crypto Vault India
     </div>
+
 </body>
 </html>
+
 
 

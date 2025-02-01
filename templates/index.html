@@ -46,6 +46,21 @@
         .button-link:hover {
             background-color: #45a049;
         }
+        .logout-btn {
+            background-color: red;
+            color: white;
+            padding: 10px 25px;
+            font-size: 18px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: auto;
+            margin-top: 20px;
+            transition: background-color 0.3s;
+        }
+        .logout-btn:hover {
+            background-color: #cc0000; /* Darker red on hover */
+        }
         .footer {
             position: fixed;
             bottom: 0;
@@ -67,8 +82,12 @@
     <div class="container">
         <a href="/create_wallet" class="button-link">Create Wallet</a>
         <a href="/send" class="button-link">Send Litecoin</a>
-        <!-- Added the button-link class to ensure consistency -->
         <a href="{{ url_for('wallet_balance') }}" class="button-link">Check Wallet Balance</a>
+        
+        <!-- Logout button -->
+        <a href="{{ url_for('logout') }}">
+            <button class="logout-btn">Logout</button>
+        </a>
     </div>
 
     <div class="footer">
@@ -76,4 +95,6 @@
     </div>
 </body>
 </html>
+
+
 

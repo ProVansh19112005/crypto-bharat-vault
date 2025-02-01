@@ -72,6 +72,12 @@ def login():
 
     return render_template('login.html')
 
+@app.route('/logout')
+def logout():
+    session.pop('user_id', None)  # Remove the user from the session
+    return render_template('logout.html')  # Render the logout success page
+
+
 @app.route('/index')
 def index():
     if 'user_id' not in session:
