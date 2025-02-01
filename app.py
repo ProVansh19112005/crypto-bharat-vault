@@ -1,18 +1,28 @@
+import os
 from flask import Flask, render_template, request, redirect, url_for, session
 from flask_sqlalchemy import SQLAlchemy
+from flask_session import Session  # FIXED: Import Session
 import bitcoin
-import os
-from sqlalchemy.exc import IntegrityError
 import re
 
-app = Flask(__name__)  # Initialize Flask app
-from flask_session import Session
-app.config['SESSION_TYPE'] = 'filesystem'  # Stores session data in a temporary directory
+app = Flask(__name__)
+
+# **Fix 1: Configure Database**
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///database.db')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# **Fix 2: Configure Session**
+app.config['SESSION_TYPE'] = 'filesystem'  # Stores session data locally
 app.config['SESSION_PERMANENT'] = False
-app.config['SESSION_USE_SIGNER'] = True  # Ensures session integrity
-app.config['SECRET_KEY'] = 'CQGUUlizE20hTstY'  # Change this to a strong secret key
-Session(app)  # Initialize session
-db = SQLAlchemy(app)  # Initialize database
+app.config['SESSION_USE_SIGNER'] = True
+app.config['SECRET_KEY'] = os.getenv("SECRET_KEY", "fallback-secret-key")
+
+# **Fix 3: Initialize Session**
+Session(app)  # FIXED: Session is now imported and initialized correctly
+
+# **Fix 4: Initialize Database**
+db = SQLAlchemy(app)
+
 
 
 # Define User model
