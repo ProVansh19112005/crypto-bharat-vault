@@ -5,12 +5,13 @@ import os
 from sqlalchemy.exc import IntegrityError
 import re
 
-app = Flask(__name__)
-# Use PostgreSQL for Heroku or SQLite for local development
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///users.db')
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.secret_key = os.getenv('SECRET_KEY', os.urandom(24))  # Ensure consistent secret key in production
-db = SQLAlchemy(app)
+from flask_session import Session
+app.config['SESSION_TYPE'] = 'filesystem'  # Stores session data in a temporary directory
+app.config['SESSION_PERMANENT'] = False
+app.config['SESSION_USE_SIGNER'] = True  # Ensures session integrity
+app.config['SECRET_KEY'] = 'CQGUUlizE20hTstY'  # Change this to a strong secret key
+Session(app)  # Initialize session
+
 
 # Define User model
 class User(db.Model):
