@@ -46,27 +46,6 @@
         .button-link:hover {
             background-color: #45a049;
         }
-        .wallet-info {
-            color: #333;
-            margin-top: 20px;
-            font-size: 18px;
-        }
-        .wallet-info a {
-            background-color: #4CAF50;
-            color: white;
-            text-decoration: none;
-            padding: 15px 30px;
-            margin: 10px 0;
-            border-radius: 5px;
-            font-size: 18px;
-            width: 60%;
-            max-width: 300px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            transition: background-color 0.3s;
-        }
-        .wallet-info a:hover {
-            background-color: #45a049;
-        }
         .footer {
             position: fixed;
             bottom: 0;
@@ -83,19 +62,13 @@
         Crypto Vault India
     </header>
 
-    <h1>Welcome to Crypto Vault India</h1>
+    <h1>Welcome, {{ user.username }}</h1>
 
     <div class="container">
         <a href="/create_wallet" class="button-link">Create Wallet</a>
         <a href="/send" class="button-link">Send Litecoin</a>
-
-        <div class="wallet-info">
-            {% if address %}
-                <a href="/wallet_balance/{{ address }}" class="button-link">Check Wallet Balance</a>
-            {% else %}
-                <span class="button-link">Please create a wallet first to check balance.</span>
-            {% endif %}
-        </div>
+        <!-- Added the button-link class to ensure consistency -->
+        <a href="{{ url_for('wallet_balance') }}" class="button-link">Check Wallet Balance</a>
     </div>
 
     <div class="footer">
@@ -103,5 +76,4 @@
     </div>
 </body>
 </html>
-
 

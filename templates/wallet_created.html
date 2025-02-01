@@ -3,13 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wallet Created</title>
+    <title>Wallet Created - Crypto Vault India</title>
+    <style>
+        /* Your styles here */
+    </style>
 </head>
 <body>
-    <h1>Your Litecoin Wallet is Created!</h1>
-    <p><strong>Address:</strong> {{ address }}</p>
-    <p><strong>Private Key:</strong> {{ private_key }}</p>
-    <br>
-    <a href="/">Go Back to Home</a>
+    <header>
+        Crypto Vault India
+    </header>
+
+    <h2>Wallet Created Successfully</h2>
+
+    <div class="container">
+        <p class="message">Your new wallet has been created successfully! You can now start using it.</p>
+        <p>Your Litecoin address is: <strong>{{ user.litecoin_address }}</strong></p>
+        <p><a href="/index" style="color: #4CAF50;">Go back to home</a></p>
+    </div>
+
+    <div class="footer">
+        &copy; 2025 Crypto Vault India
+    </div>
 </body>
 </html>
+
+

@@ -5,14 +5,6 @@ import base58
 
 def create_wallet():
     try:
-        # Check if a wallet already exists in file
-        try:
-            with open('wallet.json', 'r') as file:
-                wallet_data = json.load(file)
-                return wallet_data['address'], wallet_data['private_key']
-        except FileNotFoundError:
-            pass  # No wallet file, will create a new one
-
         # Generate private key
         private_key = ecdsa.SigningKey.generate(curve=ecdsa.SECP256k1).to_string().hex()
 
@@ -28,10 +20,6 @@ def create_wallet():
         # Add checksum
         checksum = hashlib.sha256(hashlib.sha256(hashed_public_key).digest()).digest()[:4]
         address = base58.b58encode(hashed_public_key + checksum).decode()
-
-        # Save wallet data to a file
-        with open('wallet.json', 'w') as file:
-            json.dump({'address': address, 'private_key': private_key}, file)
 
         return address, private_key
     except Exception as e:
@@ -59,6 +47,7 @@ def get_balance(address):
         return balance
     else:
         return "Error: Unable to retrieve balance"
+
 
 
 
