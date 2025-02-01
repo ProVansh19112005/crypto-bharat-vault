@@ -6,9 +6,10 @@ from sqlalchemy.exc import IntegrityError
 import re
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
+# Use PostgreSQL for Heroku or SQLite for local development
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///users.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.secret_key = os.urandom(24)  # To manage sessions
+app.secret_key = os.getenv('SECRET_KEY', os.urandom(24))  # Ensure consistent secret key in production
 db = SQLAlchemy(app)
 
 # Define User model
