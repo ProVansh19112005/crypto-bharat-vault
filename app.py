@@ -5,12 +5,14 @@ import os
 from sqlalchemy.exc import IntegrityError
 import re
 
+app = Flask(__name__)  # Initialize Flask app
 from flask_session import Session
 app.config['SESSION_TYPE'] = 'filesystem'  # Stores session data in a temporary directory
 app.config['SESSION_PERMANENT'] = False
 app.config['SESSION_USE_SIGNER'] = True  # Ensures session integrity
 app.config['SECRET_KEY'] = 'CQGUUlizE20hTstY'  # Change this to a strong secret key
 Session(app)  # Initialize session
+db = SQLAlchemy(app)  # Initialize database
 
 
 # Define User model
