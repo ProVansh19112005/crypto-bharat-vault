@@ -35,8 +35,13 @@ class User(db.Model):
 @app.route('/')
 def home():
     if 'user_id' not in session:
-        return redirect(url_for('login'))  # Redirect to login if not logged in
+        return redirect(url_for('intro'))  # Redirect to login if not logged in
     return redirect(url_for('index'))  # Redirect to the index page if logged in
+
+@app.route('/intro')
+def intro():
+    return render_template('intro.html')
+
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
