@@ -3,28 +3,122 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Check Wallet Balance</title>
+    <title>Check Wallet Balance - Crypto Vault India</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #f7f7f7;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+        header {
+            background-color: #333;
+            color: white;
+            padding: 20px 0;
+            font-size: 24px;
+        }
+        .container {
+            margin-top: 50px;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 60%;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .form-input {
+            padding: 12px;
+            margin: 15px 0;
+            width: 100%;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .form-button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+        .form-button:hover {
+            background-color: #45a049;
+        }
+        .footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background-color: #333;
+            color: white;
+            padding: 10px;
+            text-align: center;
+        }
+        .alert {
+            padding: 10px;
+            margin-top: 20px;
+            border-radius: 5px;
+        }
+        .alert-success {
+            background-color: #28a745;
+            color: white;
+        }
+        .alert-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+        .go-back {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border-radius: 5px;
+            text-decoration: none;
+        }
+        .go-back:hover {
+            background-color: #0056b3;
+        }
+    </style>
 </head>
 <body>
-    <h1>Check Wallet Balance</h1>
+    <header>
+        Crypto Vault India - Check Wallet Balance
+    </header>
 
-    <!-- Form to enter another address -->
-    <form action="/check_balance" method="POST">
-        <label for="address">Enter Litecoin Address (your address balance by default):</label>
-        <input type="text" name="address" id="address" value="{{ address }}" placeholder="Enter address">
-        <input type="submit" value="Check Balance">
-    </form>
+    <div class="container">
+        <h2>Check Wallet Balance</h2>
 
-    {% if balance is not none %}
-        <h2>Balance for address: {{ address }}</h2>
-        <p>Confirmed Balance: {{ balance }} LTC</p>
-        <p>Unconfirmed Balance: {{ unconfirmed_balance }} LTC</p>
-    {% elif error is not none %}
-        <h2>Error</h2>
-        <p>{{ error }}</p>
-    {% endif %}
+        <!-- Form to enter another address -->
+        <form action="/check_balance" method="POST">
+            <label for="address">Enter Litecoin Address (Your address balance by default):</label>
+            <input type="text" name="address" id="address" value="{{ address }}" placeholder="Enter address" class="form-input">
+            <input type="submit" value="Check Balance" class="form-button">
+        </form>
 
-    <a href="/">Go Back</a>
+        {% if balance is not none %}
+            <h3>Balance for Address: {{ address }}</h3>
+            <p>Confirmed Balance: <strong>{{ balance }} LTC</strong></p>
+            <p>Unconfirmed Balance: <strong>{{ unconfirmed_balance }} LTC</strong></p>
+        {% elif error is not none %}
+            <div class="alert alert-danger">
+                <strong>Error:</strong> {{ error }}
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="footer">
+        &copy; 2025 Crypto Vault India
+    </div>
+
+    <a href="/" class="go-back">Go Back to Dashboard</a>
 </body>
 </html>
+
 
