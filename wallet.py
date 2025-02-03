@@ -2,19 +2,25 @@ import json
 import ecdsa
 import hashlib
 import base58
+import requests
 
+# Create a Litecoin wallet
 def create_wallet():
     try:
         # Generate private key
-        private_key = ecdsa.SigningKey.generate(curve=ecdsa.SECP256k1).to_string().hex()
+        sk = ecdsa.SigningKey.generate(curve=ecdsa.SECP256k1)
+        private_key = sk.to_string().hex()
 
         # Compute public key
-        public_key = '04' + private_key[:64] + private_key[64:]
+        vk = sk.verifying_key
+        public_key = b'\x04' + vk.to_string()
 
         # Hash public key for address
-        sha256 = hashlib.sha256(bytes.fromhex(public_key)).digest()
+        sha256 = hashlib.sha256(public_key).digest()
         ripemd160 = hashlib.new('ripemd160', sha256).digest()
-        prefix = b'\x30'  # Litecoin prefix
+
+        # Litecoin Mainnet Prefix (P2PKH - addresses start with 'L')
+        prefix = b'\x30'  
         hashed_public_key = prefix + ripemd160
 
         # Add checksum
@@ -26,27 +32,35 @@ def create_wallet():
         print("Error creating wallet:", e)
         return None, None
 
-def send_litecoin(private_key, recipient, amount):
-    try:
-        wallet = Wallet("LitecoinWallet")
-        tx = wallet.send_to(recipient, amount, network='litecoin')
-        return tx
-    except Exception as e:
-        print(f"Error sending Litecoin: {e}")
-        return None
-
-# Show Balance
-import requests
-def get_balance(address):
-    url = f'https://api.blockcypher.com/v1/ltc/main/addrs/{address}/balance'
+# Get Litecoin balance using SoChain API
+def get_balance(litecoin_address):
+    url = f"https://api.blockcypher.com/v1/ltc/main/addrs/{litecoin_address}/balance"
     response = requests.get(url)
-    
+
+    # Log the response
+    print(f"API Response: {response.status_code} - {response.text}")
+
     if response.status_code == 200:
-        data = response.json()
-        balance = data.get('final_balance', 0) / 100000000  # Convert to LTC
-        return balance
+        balance_data = response.json()
+        return balance_data.get('final_balance', 0)
     else:
-        return "Error: Unable to retrieve balance"
+        print(f"Error fetching balance: {response.status_code}")
+        return 0
+
+
+# Placeholder for send_litecoin (transaction signing not implemented yet)
+def send_litecoin(private_key, recipient, amount):
+    print("Error: send_litecoin is not yet implemented")
+    return None
+
+# Example usage
+if __name__ == "__main__":
+    addr, priv = create_wallet()
+    if addr:
+        print(f"New Litecoin Address: {addr}")
+        print(f"Private Key: {priv}")
+        print(f"Balance: {get_balance(addr)} LTC")
+
 
 
 

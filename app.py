@@ -43,24 +43,86 @@ def intro():
     return render_template('intro.html')
 
 
+from bitcoinlib.wallets import Wallet
+
+import uuid
+from bitcoinlib.wallets import Wallet
+
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
         username = request.form['username']
-        password = request.form['password']  # You can add hashing here for security
+        password = request.form['password']
         
-        # Generate a new Litecoin address
-        private_key = bitcoin.random_key()
-        public_key = bitcoin.privtopub(private_key)
-        litecoin_address = bitcoin.pubtoaddr(public_key)
+        # Generate a unique wallet name using UUID
+        wallet_name = f"LitecoinWallet_{uuid.uuid4().hex}"
 
-        # Save the new user in the database
-        new_user = User(username=username, password=password, litecoin_address=litecoin_address)
-        db.session.add(new_user)
-        db.session.commit()
+        try:
+            # Create a new wallet with the unique name
+            wallet = Wallet.create(wallet_name, network='litecoin')
+            
+            # Generate the Litecoin address
+            litecoin_address = wallet.get_key().address
+            
+            # Save user details and the generated Litecoin address
+            new_user = User(username=username, password=password, litecoin_address=litecoin_address)
+            db.session.add(new_user)
+            db.session.commit()
 
-        return redirect(url_for('login'))  # Redirect to login after successful registration
+            return redirect(url_for('login'))  # Redirect to login after successful registration
+
+        except WalletError as e:
+            # Handle wallet creation error
+            print(f"Error creating wallet: {e}")
+            return render_template('register.html', error="Error creating wallet")
+
     return render_template('register.html')
+
+
+
+@app.route('/check_balance', methods=['GET', 'POST'])
+def check_balance():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))  # Redirect to login if not logged in
+
+    user = User.query.get(session['user_id'])  # Get the current logged-in user
+    litecoin_address = user.litecoin_address  # Get the user's Litecoin address
+
+    # If the address is not present, show an error
+    if not litecoin_address:
+        return render_template('error.html', message="No Litecoin address found.")
+
+    # If the user submitted a different address via the form
+    address_to_check = request.form.get('address', litecoin_address)  # Default to user's address
+
+    # Fetch the balance for the Litecoin address
+    url = f"https://api.blockcypher.com/v1/ltc/main/addrs/{address_to_check}/balance"
+
+    try:
+        response = requests.get(url)
+        print(f"API Status Code: {response.status_code}")  # Log status code
+        print(f"API Response: {response.text}")  # Log response text for debugging
+
+        if response.status_code == 200:
+            data = response.json()
+            balance = data.get('final_balance', 0) / 1e8  # Convert to LTC
+            unconfirmed_balance = data.get('unconfirmed_balance', 0) / 1e8  # Unconfirmed balance
+
+            return render_template('check_balance.html', balance=balance, 
+                                   unconfirmed_balance=unconfirmed_balance, address=address_to_check)
+        else:
+            error_message = "Error fetching balance. Please try again."
+            return render_template('check_balance.html', error=error_message)
+    except Exception as e:
+        print(f"Error: {str(e)}")  # Log the exception
+        return render_template('check_balance.html', error=f"An error occurred: {str(e)}")
+
+    return render_template('check_balance.html')
+
+
+
+
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -141,31 +203,18 @@ def send_litecoin():
     return render_template('send_litecoin.html', user=user)
 
 
+
+from bitcoinlib.wallets import Wallet
+
 def generate_litecoin_address():
-    private_key = bitcoin.random_key()
-    public_key = bitcoin.privtopub(private_key)
-    litecoin_address = bitcoin.pubtoaddr(public_key, network='litecoin')
-
-    # Validate Litecoin address format using regex
-    litecoin_regex = re.compile(r'^[LM][A-Za-z0-9]{26,35}$')
+    # Create a new wallet for Litecoin (can specify network as 'litecoin')
+    wallet = Wallet.create('LitecoinWallet')  
     
-    if not litecoin_regex.match(litecoin_address):
-        raise ValueError(f"Invalid Litecoin address generated: {litecoin_address}")
-    
-    # Check the length of the address
-    if len(litecoin_address) < 26 or len(litecoin_address) > 35:
-        raise ValueError(f"Invalid Litecoin address length: {litecoin_address}")
-
-    # Check if the address starts with L or M
-    if not (litecoin_address.startswith('L') or litecoin_address.startswith('M')):
-        raise ValueError(f"Invalid Litecoin address prefix: {litecoin_address}")
-    
-    # Optionally check if the address already exists in the database (ensure uniqueness)
-    existing_address = User.query.filter_by(litecoin_address=litecoin_address).first()
-    if existing_address:
-        raise ValueError(f"Litecoin address already exists in the database: {litecoin_address}")
-
+    # Get the Litecoin address from the generated wallet
+    litecoin_address = wallet.get_key().address
     return litecoin_address
+
+
 
 
 
@@ -180,16 +229,15 @@ def wallet_balance():
     user = User.query.get(session['user_id'])
     litecoin_address = user.litecoin_address
 
-    print(f"DEBUG: Checking balance for address {litecoin_address}")  # Add this line
+    print(f"DEBUG: Checking balance for address {litecoin_address}")  # Debugging line
 
     try:
         balance = get_litecoin_balance(litecoin_address)  # Call the new API
-        print(f"DEBUG: Balance for {litecoin_address} is {balance}")  # Add this line
+        print(f"DEBUG: Balance for {litecoin_address} is {balance}")  # Debugging line
         return render_template('wallet_balance.html', balance=balance, litecoin_address=litecoin_address)
     except Exception as e:
-        print(f"DEBUG: Error fetching balance: {str(e)}")  # Add this line for more insight
+        print(f"DEBUG: Error fetching balance: {str(e)}")  # Debugging line
         return render_template('error.html', message="Error fetching balance.")
-
 
 
 
@@ -197,15 +245,25 @@ def wallet_balance():
 import requests
 
 def get_litecoin_balance(address):
-    url = f"https://api.blockchair.com/ltc/testnet/dashboards/address/{address}"
-    response = requests.get(url)
+    url = f'https://sochain.com/api/v2/get_address_balance/LTC/{address}'
     
-    if response.status_code == 200:
-        data = response.json()
-        return data['data'][address]['address']['balance'] / 1e8  # Convert from satoshis to LTC
-    else:
-        print(f"Error fetching balance: {response.text}")
-        raise Exception(f"Error fetching balance: {response.text}")
+    try:
+        response = requests.get(url)
+        print(f"DEBUG: API Response: {response.text}")  # Log the raw response text
+        
+        if response.status_code == 200:
+            data = response.json()
+            if 'data' in data:
+                return data["data"]["confirmed_balance"]  # The confirmed balance in LTC
+            else:
+                raise Exception("Address not found or invalid")
+        else:
+            raise Exception(f"Error fetching balance. Status code: {response.status_code}")
+    except Exception as e:
+        print(f"Error fetching balance: {e}")
+        raise
+
+
 
 
 
