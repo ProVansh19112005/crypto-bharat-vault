@@ -95,6 +95,10 @@ def check_balance():
     # If the user submitted a different address via the form
     address_to_check = request.form.get('address', litecoin_address)  # Default to user's address
 
+    # Simple validation: Check if it starts with "ltc" and has exactly 43 characters
+    if not address_to_check.startswith("ltc") or len(address_to_check) != 43:
+        return render_template('check_balance.html', error="Invalid Litecoin address!", address=address_to_check)
+
     # Fetch the balance for the Litecoin address
     url = f"https://api.blockcypher.com/v1/ltc/main/addrs/{address_to_check}/balance"
 
@@ -112,17 +116,15 @@ def check_balance():
                                    unconfirmed_balance=unconfirmed_balance, address=address_to_check)
         else:
             error_message = "Error fetching balance. Please try again."
-            return render_template('check_balance.html', error=error_message)
+            return render_template('check_balance.html', error=error_message, address=address_to_check)
     except Exception as e:
         print(f"Error: {str(e)}")  # Log the exception
-        return render_template('check_balance.html', error=f"An error occurred: {str(e)}")
+        return render_template('check_balance.html', error=f"An error occurred: {str(e)}", address=address_to_check)
 
     return render_template('check_balance.html')
 
 
-
-
-
+    
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -176,12 +178,6 @@ def create_wallet():
     return render_template('wallet_created.html', user=user)
 
 
-
-
-
-
-
-
 @app.route('/send', methods=['GET', 'POST'])
 def send_litecoin():
     if 'user_id' not in session:
@@ -203,7 +199,6 @@ def send_litecoin():
     return render_template('send_litecoin.html', user=user)
 
 
-
 from bitcoinlib.wallets import Wallet
 
 def generate_litecoin_address():
@@ -213,12 +208,6 @@ def generate_litecoin_address():
     # Get the Litecoin address from the generated wallet
     litecoin_address = wallet.get_key().address
     return litecoin_address
-
-
-
-
-
-
 
 
 @app.route('/check_balance', methods=['GET'])
@@ -240,33 +229,35 @@ def wallet_balance():
         return render_template('error.html', message="Error fetching balance.")
 
 
-
+import requests
 
 import requests
 
+def is_valid_litecoin_address(address):
+    """Check if the Litecoin address is valid based on length and prefix."""
+    return isinstance(address, str) and len(address) == 43 and address.startswith("ltc")
+
 def get_litecoin_balance(address):
+    if not is_valid_litecoin_address(address):
+        raise ValueError("Invalid Litecoin address. It must be 43 characters long and start with 'ltc'.")
+
     url = f'https://sochain.com/api/v2/get_address_balance/LTC/{address}'
-    
+
     try:
         response = requests.get(url)
         print(f"DEBUG: API Response: {response.text}")  # Log the raw response text
-        
+
         if response.status_code == 200:
             data = response.json()
-            if 'data' in data:
+            if 'data' in data and 'confirmed_balance' in data["data"]:
                 return data["data"]["confirmed_balance"]  # The confirmed balance in LTC
             else:
-                raise Exception("Address not found or invalid")
+                raise Exception("Address not found or invalid.")
         else:
             raise Exception(f"Error fetching balance. Status code: {response.status_code}")
     except Exception as e:
         print(f"Error fetching balance: {e}")
         raise
-
-
-
-
-
 
 
 if __name__ == '__main__':

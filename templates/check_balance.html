@@ -11,39 +11,55 @@
             margin: 0;
             padding: 0;
             text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
         }
         header {
             background-color: #333;
             color: white;
             padding: 20px 0;
             font-size: 24px;
+            width: 100%;
         }
         .container {
-            margin-top: 50px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-top: 5vh; /* Reduced from 10vh to 5vh */
             padding: 20px;
             background: white;
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             width: 60%;
             max-width: 500px;
-            margin-left: auto;
-            margin-right: auto;
+            padding-bottom: 20px;
+            font-size: 14px;
+            margin-bottom: 60px;
+        }
+        .form-label {
+            margin-bottom: 12px;
+            font-size: 14px;
+            font-weight: bold;
         }
         .form-input {
             padding: 12px;
-            margin: 15px 0;
+            margin: 12px 0;
             width: 100%;
-            font-size: 16px;
+            font-size: 14px;
             border: 1px solid #ccc;
             border-radius: 5px;
+            text-align: center;
         }
         .form-button {
             background-color: #4CAF50;
             color: white;
-            padding: 15px 30px;
+            padding: 12px 25px;
             border: none;
             border-radius: 5px;
-            font-size: 18px;
+            font-size: 16px;
             cursor: pointer;
             width: 100%;
             transition: background-color 0.3s;
@@ -59,15 +75,14 @@
             color: white;
             padding: 10px;
             text-align: center;
+            font-size: 16px;
         }
         .alert {
             padding: 10px;
-            margin-top: 20px;
+            margin-top: 18px;
             border-radius: 5px;
-        }
-        .alert-success {
-            background-color: #28a745;
-            color: white;
+            width: 100%;
+            text-align: center;
         }
         .alert-danger {
             background-color: #dc3545;
@@ -75,8 +90,8 @@
         }
         .go-back {
             display: inline-block;
-            margin-top: 20px;
-            padding: 10px 20px;
+            margin-top: 18px;
+            padding: 8px 16px;
             background-color: #007bff;
             color: white;
             border-radius: 5px;
@@ -93,12 +108,19 @@
     </header>
 
     <div class="container">
+        <!-- Display error message if exists, placed between header and content -->
+        {% if error %}
+            <div class="alert alert-danger">
+                <strong>Error:</strong> {{ error }}
+            </div>
+        {% endif %}
+
         <h2>Check Wallet Balance</h2>
 
-        <!-- Form to enter another address -->
+        <!-- Form to enter address -->
+        <label for="address" class="form-label">Enter Litecoin Address (Your address balance by default):</label>
         <form action="/check_balance" method="POST">
-            <label for="address">Enter Litecoin Address (Your address balance by default):</label>
-            <input type="text" name="address" id="address" value="{{ address }}" placeholder="Enter address" class="form-input">
+            <input type="text" name="address" id="address" value="{{ address or '' }}" placeholder="Enter address" class="form-input">
             <input type="submit" value="Check Balance" class="form-button">
         </form>
 
@@ -106,19 +128,14 @@
             <h3>Balance for Address: {{ address }}</h3>
             <p>Confirmed Balance: <strong>{{ balance }} LTC</strong></p>
             <p>Unconfirmed Balance: <strong>{{ unconfirmed_balance }} LTC</strong></p>
-        {% elif error is not none %}
-            <div class="alert alert-danger">
-                <strong>Error:</strong> {{ error }}
-            </div>
+
+            <!-- Go back button after balance display -->
+            <a href="/" class="go-back">Go Back to Dashboard</a>
         {% endif %}
     </div>
 
     <div class="footer">
         &copy; 2025 Crypto Vault India
     </div>
-
-    <a href="/" class="go-back">Go Back to Dashboard</a>
 </body>
 </html>
-
-
