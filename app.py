@@ -241,7 +241,7 @@ def get_litecoin_balance(address):
     if not is_valid_litecoin_address(address):
         raise ValueError("Invalid Litecoin address. It must be 43 characters long and start with 'ltc'.")
 
-    url = f'https://sochain.com/api/v2/get_address_balance/LTC/{address}'
+    url = f"https://api.blockcypher.com/v1/ltc/main/addrs/{address_to_check}/balance"
 
     try:
         response = requests.get(url)
