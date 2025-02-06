@@ -4,12 +4,14 @@ import hashlib
 import base58
 import requests
 
+
+
 # Create a Litecoin wallet
 def create_wallet():
     try:
         # Generate private key
         sk = ecdsa.SigningKey.generate(curve=ecdsa.SECP256k1)
-        private_key = sk.to_string().hex()
+        private_key = sk.to_string().hex()  # Hex format of private key
 
         # Compute public key
         vk = sk.verifying_key
@@ -27,10 +29,15 @@ def create_wallet():
         checksum = hashlib.sha256(hashlib.sha256(hashed_public_key).digest()).digest()[:4]
         address = base58.b58encode(hashed_public_key + checksum).decode()
 
-        return address, private_key
+        # Convert private key to WIF format
+        wif_prefix = b'\xb0'  # Prefix for Litecoin mainnet private keys
+        private_key_wif = base58.b58encode_check(wif_prefix + bytes.fromhex(private_key)).decode()
+
+        return address, private_key_wif  # Return both Litecoin address and WIF private key
     except Exception as e:
         print("Error creating wallet:", e)
         return None, None
+
 
 # Get Litecoin balance using SoChain API
 def get_balance(litecoin_address):
@@ -48,19 +55,10 @@ def get_balance(litecoin_address):
         return 0
 
 
-# Placeholder for send_litecoin (transaction signing not implemented yet)
-def send_litecoin(private_key, recipient, amount):
+# Pending
+def send_litecoin():
     print("Error: send_litecoin is not yet implemented")
     return None
-
-# Example usage
-if __name__ == "__main__":
-    addr, priv = create_wallet()
-    if addr:
-        print(f"New Litecoin Address: {addr}")
-        print(f"Private Key: {priv}")
-        print(f"Balance: {get_balance(addr)} LTC")
-
 
 
 

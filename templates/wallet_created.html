@@ -37,7 +37,7 @@
             color: #333;
             margin-bottom: 20px;
         }
-        .litecoin-address {
+        .litecoin-address, .private-key {
             font-size: 16px;
             color: #555;
             background-color: #f1f1f1;
@@ -47,6 +47,12 @@
             max-width: 90%;
             margin: 10px auto;
             display: block;
+        }
+        .warning {
+            color: red;
+            font-size: 14px;
+            margin-top: 10px;
+            font-weight: bold;
         }
         .button-link {
             background-color: #4CAF50;
@@ -83,8 +89,14 @@
 
     <div class="container">
         <p class="message">Your new wallet has been created successfully! You can now start using it.</p>
-        <p>Your Litecoin address is:</p>
+        
+        <p><strong>Your Litecoin Address:</strong></p>
         <p class="litecoin-address">{{ user.litecoin_address }}</p>
+
+        <p><strong>Your Private Key (WIF):</strong></p>
+        <p class="private-key">{{ user.private_key }}</p>
+        <p class="warning">⚠️ WARNING: Store this private key securely! If you lose it, you will not be able to recover your funds.</p>
+
         <a href="/index" class="button-link">Go back to home</a>
     </div>
 
@@ -94,6 +106,5 @@
 
 </body>
 </html>
-
 
 

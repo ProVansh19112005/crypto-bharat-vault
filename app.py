@@ -1,29 +1,35 @@
 import os
+import hashlib
+import base58
 from flask import Flask, render_template, request, redirect, url_for, session
 from flask_sqlalchemy import SQLAlchemy
-from flask_session import Session  # FIXED: Import Session
-import bitcoin
-import re
+from flask_session import Session
+import uuid
+import requests
+from bitcoinlib.wallets import Wallet
+from pycoin.key import Key  # Importing pycoin for key generation
+from ecdsa import SigningKey, SECP256k1  # Ensure this is also included
+from flask import Flask, render_template, request, redirect, url_for, session, flash
+
+
 
 app = Flask(__name__)
 
-# **Fix 1: Configure Database**
+# Configure Database
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///database.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# **Fix 2: Configure Session**
-app.config['SESSION_TYPE'] = 'filesystem'  # Stores session data locally
+# Configure Session
+app.config['SESSION_TYPE'] = 'filesystem'
 app.config['SESSION_PERMANENT'] = False
 app.config['SESSION_USE_SIGNER'] = True
 app.config['SECRET_KEY'] = os.getenv("SECRET_KEY", "fallback-secret-key")
 
-# **Fix 3: Initialize Session**
-Session(app)  # FIXED: Session is now imported and initialized correctly
+# Initialize Session
+Session(app)
 
-# **Fix 4: Initialize Database**
+# Initialize Database
 db = SQLAlchemy(app)
-
-
 
 # Define User model
 class User(db.Model):
@@ -31,22 +37,20 @@ class User(db.Model):
     username = db.Column(db.String(100), unique=True, nullable=False)
     password = db.Column(db.String(100), nullable=False)
     litecoin_address = db.Column(db.String(100), unique=True, nullable=False)
+    private_key = db.Column(db.String(200), nullable=True)  # Add this field for storing private key
+
 
 @app.route('/')
 def home():
     if 'user_id' not in session:
-        return redirect(url_for('intro'))  # Redirect to login if not logged in
-    return redirect(url_for('index'))  # Redirect to the index page if logged in
+        return redirect(url_for('intro'))
+    return redirect(url_for('index'))
+
 
 @app.route('/intro')
 def intro():
     return render_template('intro.html')
 
-
-from bitcoinlib.wallets import Wallet
-
-import uuid
-from bitcoinlib.wallets import Wallet
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -54,28 +58,27 @@ def register():
         username = request.form['username']
         password = request.form['password']
         
-        # Generate a unique wallet name using UUID
-        wallet_name = f"LitecoinWallet_{uuid.uuid4().hex}"
+        # Check if the username already exists in the database
+        user = User.query.filter_by(username=username).first()
+        if user:
+            flash('Username already exists', 'error')
+            return redirect(url_for('register'))
+        
+        # Generate wallet and private key after successful registration
+        print(f"DEBUG: Generating Litecoin wallet for new user {username}...")
+        private_key, litecoin_address = generate_private_key()
+        
+        # Save user data to the database
+        new_user = User(username=username, password=password, litecoin_address=litecoin_address, private_key=private_key)
+        db.session.add(new_user)
+        db.session.commit()
 
-        try:
-            # Create a new wallet with the unique name
-            wallet = Wallet.create(wallet_name, network='litecoin')
-            
-            # Generate the Litecoin address
-            litecoin_address = wallet.get_key().address
-            
-            # Save user details and the generated Litecoin address
-            new_user = User(username=username, password=password, litecoin_address=litecoin_address)
-            db.session.add(new_user)
-            db.session.commit()
-
-            return redirect(url_for('login'))  # Redirect to login after successful registration
-
-        except WalletError as e:
-            # Handle wallet creation error
-            print(f"Error creating wallet: {e}")
-            return render_template('register.html', error="Error creating wallet")
-
+        flash('Registration successful', 'success')
+        print(f"DEBUG: Wallet generated for user {username} - Address = {litecoin_address}, Private Key = {private_key}")
+        
+        # Redirect to login page
+        return redirect(url_for('login'))
+    
     return render_template('register.html')
 
 
@@ -96,7 +99,8 @@ def check_balance():
     address_to_check = request.form.get('address', litecoin_address)  # Default to user's address
 
     # Simple validation: Check if it starts with "ltc" and has exactly 43 characters
-    if not address_to_check.startswith("ltc") or len(address_to_check) != 43:
+    if not (address_to_check.startswith("L") or address_to_check.startswith("M")) or len(address_to_check) != 34:
+    # handle invalid address
         return render_template('check_balance.html', error="Invalid Litecoin address!", address=address_to_check)
 
     # Fetch the balance for the Litecoin address
@@ -121,39 +125,36 @@ def check_balance():
         print(f"Error: {str(e)}")  # Log the exception
         return render_template('check_balance.html', error=f"An error occurred: {str(e)}", address=address_to_check)
 
-    return render_template('check_balance.html')
+    return render_template('check_balance.html')    
 
-
-    
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-
         user = User.query.filter_by(username=username).first()
         if user and user.password == password:
-            session['user_id'] = user.id  # Store user id in session
-            return redirect(url_for('index'))  # Redirect to index after successful login
+            session['user_id'] = user.id
+            return redirect(url_for('index'))
         else:
             return "Invalid credentials, please try again."
-
     return render_template('login.html')
+
 
 @app.route('/logout')
 def logout():
-    session.pop('user_id', None)  # Remove the user from the session
-    return render_template('logout.html')  # Render the logout success page
+    session.pop('user_id', None)
+    return render_template('logout.html')
 
 
 @app.route('/index')
 def index():
     if 'user_id' not in session:
-        return redirect(url_for('login'))  # Redirect to login if not logged in
-    
+        return redirect(url_for('login'))
     user = User.query.get(session['user_id'])
     return render_template('index.html', user=user)
+
 
 @app.route('/create_wallet')
 def create_wallet():
@@ -161,96 +162,82 @@ def create_wallet():
         return redirect(url_for('login'))
 
     user = User.query.get(session['user_id'])
-    
-    # Check if the user already has a Litecoin address
+
+    # Check if wallet already exists
     if user.litecoin_address:
-        return render_template('wallet_created.html', user=user)  # Wallet already created
+        print(f"DEBUG: Wallet already exists for user {user.username}, Address: {user.litecoin_address}")
+        return render_template('wallet_created.html', user=user, private_key=user.private_key)
 
-    # Logic to create wallet if none exists
-    litecoin_address = generate_litecoin_address()  # Use your function to generate a valid address
+    # Generate a new Litecoin wallet
+    print("DEBUG: Generating new Litecoin wallet...")
+    priv_key, litecoin_address = generate_private_key()  # Generate both private key & address
 
-    # Update the user's Litecoin address
+    # Check if wallet generation was successful
+    if priv_key and litecoin_address:
+        print(f"DEBUG: Wallet generated successfully: Address = {litecoin_address}, Private Key = {priv_key}")
+    else:
+        print("DEBUG: Wallet generation failed!")
+
+    # Log the private key here to see if it is being generated properly
+    print(f"DEBUG: Generated private key: {priv_key}")
+
+    # Store generated address and private key in the database
     user.litecoin_address = litecoin_address
-    db.session.commit()
+    user.private_key = priv_key  # Store private key in the database
 
-    print(f"DEBUG: Created wallet for {user.username} with address {litecoin_address}")
+    try:
+        db.session.commit()
+        print(f"DEBUG: Database commit successful. User {user.username} - Address: {litecoin_address}, Private Key: {user.private_key}")
+    except Exception as e:
+        print(f"DEBUG: Error committing to database: {str(e)}")
 
-    return render_template('wallet_created.html', user=user)
+    # Pass the private key to the template
+    return render_template('wallet_created.html', user=user, private_key=user.private_key)
 
 
 @app.route('/send', methods=['GET', 'POST'])
 def send_litecoin():
     if 'user_id' not in session:
         return redirect(url_for('login'))
-
     user = User.query.get(session['user_id'])
-
     if request.method == 'POST':
         recipient_address = request.form.get('recipient_address')
         amount = request.form.get('amount')
-
-        # Your logic for sending Litecoin
-
-        # Assuming successful transaction
         print(f"Sent {amount} Litecoin to {recipient_address}")
-        
-        return redirect(url_for('transaction_successful'))  # Or any route you prefer
-    
+        return redirect(url_for('transaction_successful'))
     return render_template('send_litecoin.html', user=user)
-
-
-from bitcoinlib.wallets import Wallet
-
-def generate_litecoin_address():
-    # Create a new wallet for Litecoin (can specify network as 'litecoin')
-    wallet = Wallet.create('LitecoinWallet')  
-    
-    # Get the Litecoin address from the generated wallet
-    litecoin_address = wallet.get_key().address
-    return litecoin_address
 
 
 @app.route('/check_balance', methods=['GET'])
 def wallet_balance():
     if 'user_id' not in session:
         return redirect(url_for('login'))
-
     user = User.query.get(session['user_id'])
     litecoin_address = user.litecoin_address
-
-    print(f"DEBUG: Checking balance for address {litecoin_address}")  # Debugging line
-
+    print(f"DEBUG: Checking balance for address {litecoin_address}")
     try:
-        balance = get_litecoin_balance(litecoin_address)  # Call the new API
-        print(f"DEBUG: Balance for {litecoin_address} is {balance}")  # Debugging line
+        balance = get_litecoin_balance(litecoin_address)
+        print(f"DEBUG: Balance for {litecoin_address} is {balance}")
         return render_template('wallet_balance.html', balance=balance, litecoin_address=litecoin_address)
     except Exception as e:
-        print(f"DEBUG: Error fetching balance: {str(e)}")  # Debugging line
+        print(f"DEBUG: Error fetching balance: {str(e)}")
         return render_template('error.html', message="Error fetching balance.")
 
 
-import requests
-
-import requests
-
 def is_valid_litecoin_address(address):
-    """Check if the Litecoin address is valid based on length and prefix."""
     return isinstance(address, str) and len(address) == 43 and address.startswith("ltc")
+
 
 def get_litecoin_balance(address):
     if not is_valid_litecoin_address(address):
         raise ValueError("Invalid Litecoin address. It must be 43 characters long and start with 'ltc'.")
-
-    url = f"https://api.blockcypher.com/v1/ltc/main/addrs/{address_to_check}/balance"
-
+    url = f"https://api.blockcypher.com/v1/ltc/main/addrs/{address}/balance"
     try:
         response = requests.get(url)
-        print(f"DEBUG: API Response: {response.text}")  # Log the raw response text
-
         if response.status_code == 200:
             data = response.json()
             if 'data' in data and 'confirmed_balance' in data["data"]:
-                return data["data"]["confirmed_balance"]  # The confirmed balance in LTC
+                return data["data"]["confirmed_balance"]
             else:
                 raise Exception("Address not found or invalid.")
         else:
@@ -260,6 +247,44 @@ def get_litecoin_balance(address):
         raise
 
 
+def generate_private_key():
+    # Generate a random private key using os.urandom
+    private_key_bytes = os.urandom(32)
+    private_key = int.from_bytes(private_key_bytes, 'big')
+
+    # Create a SigningKey object using SECP256k1
+    sk = SigningKey.from_secret_exponent(private_key, curve=SECP256k1)
+
+    # Get the public key in compressed format
+    public_key = sk.get_verifying_key().to_string('compressed')
+
+    # Perform RIPEMD-160(SHA-256(public_key)) to get the public key hash
+    public_key_hash = hashlib.new('ripemd160', hashlib.sha256(public_key).digest()).digest()
+
+    # Add version byte for Litecoin (0x30 for mainnet, 0x6f for testnet)
+    versioned_public_key = b'\x30' + public_key_hash  # Use 0x30 for Litecoin mainnet
+
+    # Perform SHA-256 twice and take the first 4 bytes for the checksum
+    checksum = hashlib.sha256(hashlib.sha256(versioned_public_key).digest()).digest()[:4]
+
+    # Litecoin address = base58check encoding
+    address_bytes = versioned_public_key + checksum
+    litecoin_address = base58.b58encode(address_bytes).decode('utf-8')
+
+    # Return the private key (WIF) and Litecoin address
+    private_key_wif = private_key_to_wif(private_key)
+    return private_key_wif, litecoin_address
+
+
+def private_key_to_wif(private_key):
+    # Convert the private key to Wallet Import Format (WIF)
+    private_key_bytes = private_key.to_bytes(32, 'big')
+    version = b'\x80'  # Mainnet version byte
+    payload = version + private_key_bytes
+    checksum = hashlib.sha256(hashlib.sha256(payload).digest()).digest()[:4]
+    wif = base58.b58encode(payload + checksum).decode('utf-8')
+    return wif
+
+
 if __name__ == '__main__':
     app.run(debug=True)
-
