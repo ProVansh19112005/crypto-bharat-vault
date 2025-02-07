@@ -1,69 +1,37 @@
-import json
-import ecdsa
-import hashlib
-import base58
-import requests
+#!/usr/bin/env python3
+from bitcoinlib.wallets import Wallet
+from bitcoinlib.services.services import Service
 
-
-
-# Create a Litecoin wallet
-def create_wallet():
+def create_wallet(wallet_name="new_ltc_wallet"):
+    """
+    Create (or load) a new Litecoin mainnet wallet using bitcoinlib.
+    Returns a tuple: (litecoin_address, private_key_wif)
+    """
     try:
-        # Generate private key
-        sk = ecdsa.SigningKey.generate(curve=ecdsa.SECP256k1)
-        private_key = sk.to_string().hex()  # Hex format of private key
+        # Try to load an existing wallet
+        wallet = Wallet(wallet_name)
+    except Exception:
+        # Create a new wallet; keys are generated automatically
+        wallet = Wallet.create(wallet_name, network='litecoin', witness_type='legacy')
+    key = wallet.get_key()
+    address = key.address
+    private_key_wif = key.wif
+    return address, private_key_wif
 
-        # Compute public key
-        vk = sk.verifying_key
-        public_key = b'\x04' + vk.to_string()
+def get_balance(address):
+    """
+    Retrieve the balance for a Litecoin address using bitcoinlib's Service.
+    Returns the balance in satoshis.
+    """
+    service = Service(network='litecoin')
+    balance = service.getbalance(address)
+    return balance
 
-        # Hash public key for address
-        sha256 = hashlib.sha256(public_key).digest()
-        ripemd160 = hashlib.new('ripemd160', sha256).digest()
-
-        # Litecoin Mainnet Prefix (P2PKH - addresses start with 'L')
-        prefix = b'\x30'  
-        hashed_public_key = prefix + ripemd160
-
-        # Add checksum
-        checksum = hashlib.sha256(hashlib.sha256(hashed_public_key).digest()).digest()[:4]
-        address = base58.b58encode(hashed_public_key + checksum).decode()
-
-        # Convert private key to WIF format
-        wif_prefix = b'\xb0'  # Prefix for Litecoin mainnet private keys
-        private_key_wif = base58.b58encode_check(wif_prefix + bytes.fromhex(private_key)).decode()
-
-        return address, private_key_wif  # Return both Litecoin address and WIF private key
-    except Exception as e:
-        print("Error creating wallet:", e)
-        return None, None
-
-
-# Get Litecoin balance using SoChain API
-def get_balance(litecoin_address):
-    url = f"https://api.blockcypher.com/v1/ltc/main/addrs/{litecoin_address}/balance"
-    response = requests.get(url)
-
-    # Log the response
-    print(f"API Response: {response.status_code} - {response.text}")
-
-    if response.status_code == 200:
-        balance_data = response.json()
-        return balance_data.get('final_balance', 0)
-    else:
-        print(f"Error fetching balance: {response.status_code}")
-        return 0
-
-
-# Pending
-def send_litecoin():
-    print("Error: send_litecoin is not yet implemented")
-    return None
-
-
-
-
-
-
-
-
+if __name__ == '__main__':
+    wallet_name = "test_wallet"
+    address, wif = create_wallet(wallet_name)
+    print("New Litecoin Wallet Generated:")
+    print("Address:", address)
+    print("Private Key (WIF):", wif)
+    balance = get_balance(address)
+    print("Balance (in satoshis):", balance)
