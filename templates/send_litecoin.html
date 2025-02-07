@@ -1,87 +1,84 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Send Litecoin - Crypto Vault India</title>
-  <style>
-    body {
-      font-family: 'Arial', sans-serif;
-      background: #f7f7f7;
-      margin: 0;
-      padding: 0;
-      text-align: center;
-    }
-    header {
-      background-color: #333;
-      color: white;
-      padding: 20px 0;
-      font-size: 24px;
-    }
-    .container {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      margin-top: 50px;
-    }
-    .form-input {
-      padding: 10px;
-      margin: 10px;
-      width: 70%;
-      max-width: 300px;
-      font-size: 16px;
-    }
-    .form-button {
-      background-color: #4CAF50;
-      color: white;
-      padding: 15px 30px;
-      margin-top: 20px;
-      border: none;
-      border-radius: 5px;
-      font-size: 18px;
-      width: 70%;
-      max-width: 300px;
-      cursor: pointer;
-      transition: background-color 0.3s;
-    }
-    .form-button:hover {
-      background-color: #45a049;
-    }
-    .footer {
-      position: fixed;
-      bottom: 0;
-      width: 100%;
-      background-color: #333;
-      color: white;
-      padding: 10px;
-      text-align: center;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Send Litecoin - Crypto Vault India</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #f7f7f7;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+        header {
+            background-color: #333;
+            color: white;
+            padding: 20px 0;
+            font-size: 24px;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin-top: 50px;
+        }
+        .form-input {
+            padding: 10px;
+            margin: 10px;
+            width: 70%;
+            max-width: 300px;
+            font-size: 16px;
+        }
+        .form-button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px 30px;
+            margin-top: 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            width: 70%;
+            max-width: 300px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .form-button:hover {
+            background-color: #45a049;
+        }
+        .footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background-color: #333;
+            color: white;
+            padding: 10px;
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
-  <header>
-    Crypto Vault India - Send Litecoin
-  </header>
+    <header>
+        Crypto Vault India - Send Litecoin
+    </header>
 
-  <h2>Send Litecoin</h2>
+    <h2>Send Litecoin</h2>
 
-  <div class="container">
-    <form method="POST">
-      <!-- Ensure the recipient address field is correct -->
-      <input type="text" name="recipient_address" class="form-input" placeholder="Recipient Litecoin Address" required>
-      <!-- IMPORTANT: add step="any" so decimal values are allowed -->
-      <input type="number" name="amount" step="any" class="form-input" placeholder="Amount (LTC)" required>
-      <button type="submit" class="form-button">Send Litecoin</button>
-    </form>
+    <div class="container">
+        <form method="POST">
+            <input type="text" name="to_address" class="form-input" placeholder="Recipient Litecoin Address" required>
+            <input type="number" name="amount" class="form-input" placeholder="Amount (LTC)" required>
+            <button type="submit" class="form-button">Send Litecoin</button>
+        </form>
 
-    <p><a href="/index" style="color: #4CAF50;">Go back to home</a></p>
-  </div>
+        <p><a href="/index" style="color: #4CAF50;">Go back to home</a></p>
+    </div>
 
-  <div class="footer">
-    &copy; 2025 Crypto Vault India
-  </div>
+    <div class="footer">
+        &copy; 2025 Crypto Vault India
+    </div>
 </body>
 </html>
-
 
