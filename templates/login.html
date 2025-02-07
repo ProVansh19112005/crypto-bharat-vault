@@ -54,6 +54,31 @@
         .button-link:hover {
             background-color: #45a049;
         }
+        /* Flash messages styling */
+        .flash-messages {
+            list-style: none;
+            padding: 0;
+            margin: 20px auto;
+            max-width: 300px;
+            text-align: left;
+        }
+        .flash-messages li {
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+        .flash-messages .error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .flash-messages .success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .flash-messages .info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+        }
     </style>
 </head>
 <body>
@@ -64,6 +89,17 @@
     <h1>Login</h1>
 
     <div class="container">
+        <!-- Flash messages block -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <ul class="flash-messages">
+                    {% for category, message in messages %}
+                        <li class="{{ category }}">{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+
         <form method="POST">
             <input type="text" name="username" placeholder="Username" required>
             <input type="password" name="password" placeholder="Password" required>
@@ -74,3 +110,4 @@
     </div>
 </body>
 </html>
+
