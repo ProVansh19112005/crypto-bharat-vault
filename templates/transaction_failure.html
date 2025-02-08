@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Transaction Failed - Crypto Vault India</title>
+    <title>Transaction Failure - Crypto Vault India</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -17,23 +17,51 @@
             color: white;
             padding: 20px 0;
             font-size: 24px;
+            width: 100%;
+        }
+        h2 {
+            color: #4CAF50;
+            margin: 20px 0;
         }
         .container {
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            margin-top: 50px;
+            margin: 40px auto;  /* Centers container horizontally */
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 60%;
+            max-width: 500px;
         }
-        .message {
+        .error-message {
+            color: #dc3545;
             font-size: 18px;
-            color: #f44336;
             margin: 20px 0;
+        }
+        .button-link {
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            padding: 15px 30px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-size: 18px;
+            width: 60%;
+            max-width: 300px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s;
+        }
+        .button-link:hover {
+            background-color: #45a049;
         }
         .footer {
             position: fixed;
             bottom: 0;
-            width: 100%;
+            left: 0;
+            right: 0;
             background-color: #333;
             color: white;
             padding: 10px;
@@ -46,11 +74,14 @@
         Crypto Vault India
     </header>
 
-    <h2>Transaction Failed</h2>
+    <h2>Transaction Failure</h2>
 
     <div class="container">
-        <p class="message">There was an issue with your transaction. Please try again.</p>
-        <p><a href="/index" style="color: #4CAF50;">Go back to home</a></p>
+        <div class="error-message">
+            <strong>Error:</strong> {{ error }}
+        </div>
+        <a href="/send" class="button-link">Try Again</a>
+        <a href="/" class="button-link">Go Back to Dashboard</a>
     </div>
 
     <div class="footer">
@@ -58,4 +89,5 @@
     </div>
 </body>
 </html>
+
 

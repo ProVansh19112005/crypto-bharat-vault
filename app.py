@@ -94,15 +94,11 @@ def wif_to_signing_key(wif):
             priv_key_bytes = priv_key_bytes[:-1]
     elif len(decoded) >= 78:
         # Assume it's an extended private key (BIP32 format)
-        # Extended key structure (78 bytes): 4 (version) + 1 (depth) + 4 (fingerprint) + 4 (child number)
-        # + 32 (chain code) + 33 (key data). In key data, the first byte is 0x00.
         if decoded[45] == 0:
             priv_key_bytes = decoded[46:78]
         else:
-            # Fallback: take the last 32 bytes
             priv_key_bytes = decoded[-32:]
     else:
-        # Fallback: assume decoded directly is the key bytes
         priv_key_bytes = decoded
 
     if len(priv_key_bytes) != 32:
@@ -363,18 +359,18 @@ def send_litecoin():
             flash("Invalid amount.", "error")
             return redirect(url_for("send_litecoin"))
         
-        fee_satoshis = 1000  # Example fee (adjust as needed)
+        fee_satoshis = 3000  # Example fee (adjust as needed)
         
         # Fetch UTXOs for the sender's address from BlockCypher (include script info)
         utxo_url = f"https://api.blockcypher.com/v1/ltc/main/addrs/{user.litecoin_address}?unspentOnly=true&includeScript=true"
         utxo_resp = requests.get(utxo_url)
         if utxo_resp.status_code != 200:
-            flash("Error fetching UTXOs", "error")
-            return redirect(url_for("send_litecoin"))
+            error_msg = "Error fetching UTXOs: " + utxo_resp.text
+            return render_template("transaction_failure.html", error=error_msg)
         utxo_data = utxo_resp.json()
         if "txrefs" not in utxo_data or len(utxo_data["txrefs"]) == 0:
-            flash("No UTXOs available", "error")
-            return redirect(url_for("send_litecoin"))
+            error_msg = "No UTXOs available."
+            return render_template("transaction_failure.html", error=error_msg)
         
         # For simplicity, select the first UTXO with sufficient funds
         selected_utxo = None
@@ -383,8 +379,8 @@ def send_litecoin():
                 selected_utxo = utxo
                 break
         if selected_utxo is None:
-            flash("No UTXO with sufficient funds", "error")
-            return redirect(url_for("send_litecoin"))
+            error_msg = "No UTXO with sufficient funds."
+            return render_template("transaction_failure.html", error=error_msg)
         
         # Create the raw transaction manually
         raw_tx = create_signed_transaction(
@@ -396,27 +392,59 @@ def send_litecoin():
             user.private_key
         )
         if raw_tx is None:
-            flash("Failed to create raw transaction", "error")
-            return redirect(url_for("send_litecoin"))
+            error_msg = "Failed to create raw transaction."
+            return render_template("transaction_failure.html", error=error_msg)
         
         # Broadcast the raw transaction via BlockCypher's push API
         push_url = "https://api.blockcypher.com/v1/ltc/main/txs/push"
         push_data = {"tx": raw_tx}
         push_resp = requests.post(push_url, json=push_data)
         if push_resp.status_code not in (200, 201):
-            flash("Broadcast failed: " + push_resp.text, "error")
-            return redirect(url_for("send_litecoin"))
+            error_msg = "Broadcast failed: " + push_resp.text
+            return render_template("transaction_failure.html", error=error_msg)
         
         tx_info = push_resp.json()
         txid = tx_info.get("tx", {}).get("hash", "unknown")
-        flash("Transaction broadcast successfully! TXID: " + txid, "success")
-        return redirect(url_for("transaction_successful"))
+        return redirect(url_for("transaction_successful", txid=txid))
     
     return render_template('send_litecoin.html', user=user)
 
 @app.route('/transaction_successful')
 def transaction_successful():
-    return render_template('transaction_successful.html')
+    txid = request.args.get('txid')  # Get TXID from the URL parameters
+    return render_template('transaction_successful.html', txid=txid)
+
+# --------------------------
+# New Route: Transaction History
+# --------------------------
+@app.route('/history')
+def history():
+    """
+    Display the transaction history for the logged-in user's Litecoin address.
+    Uses the BlockCypher API to fetch confirmed and unconfirmed transactions.
+    """
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    user = User.query.get(session['user_id'])
+    address = user.litecoin_address
+    history_url = f"https://api.blockcypher.com/v1/ltc/main/addrs/{address}?limit=50"
+    try:
+        response = requests.get(history_url)
+        if response.status_code == 200:
+            data = response.json()
+            # BlockCypher returns "txrefs" for confirmed transactions and "unconfirmed_txrefs" for unconfirmed ones.
+            txrefs = data.get("txrefs", [])
+            unconfirmed_txrefs = data.get("unconfirmed_txrefs", [])
+            transactions = txrefs + unconfirmed_txrefs
+            # Optionally, sort transactions by confirmation time (if available)
+            transactions.sort(key=lambda x: x.get("confirmed", ""), reverse=True)
+            return render_template("history.html", transactions=transactions, address=address)
+        else:
+            flash("Error fetching transaction history", "error")
+            return redirect(url_for("index"))
+    except Exception as e:
+        flash("Error: " + str(e), "error")
+        return redirect(url_for("index"))
 
 if __name__ == '__main__':
     app.run(debug=True)

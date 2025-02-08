@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Transaction History - Crypto Vault India</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background: #f7f7f7;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+    }
+    header {
+      background-color: #333;
+      color: white;
+      padding: 20px 0;
+      font-size: 24px;
+    }
+    h1 {
+      margin: 20px 0;
+      color: #4CAF50;
+      font-size: 36px;
+    }
+    .container {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      margin-top: 40px;
+    }
+    table {
+      border: 1px solid black;
+      border-collapse: collapse;
+      margin: 0 auto;
+      width: 90%;
+      max-width: 800px;
+    }
+    th, td {
+      border: 1px solid black;
+      padding: 8px;
+      text-align: center;
+    }
+    .button-link {
+      background-color: #4CAF50;
+      color: white;
+      text-decoration: none;
+      padding: 15px 30px;
+      margin: 20px 0;
+      border-radius: 5px;
+      font-size: 18px;
+      width: auto;
+      max-width: 300px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      transition: background-color 0.3s;
+    }
+    .button-link:hover {
+      background-color: #45a049;
+    }
+    .footer {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      background-color: #333;
+      color: white;
+      padding: 10px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    Crypto Vault India
+  </header>
+
+  <h1>Transaction History for {{ address }}</h1>
+
+  <div class="container">
+    {% if transactions %}
+      <table>
+        <tr>
+          <th>Tx Hash</th>
+          <th>Confirmation Time</th>
+          <th>Value (LTC)</th>
+          <th>Direction</th>
+        </tr>
+        {% for tx in transactions %}
+          <tr>
+            <td>
+              <a href="https://live.blockcypher.com/ltc/tx/{{ tx.tx_hash }}/" target="_blank">
+                {{ tx.tx_hash }}
+              </a>
+            </td>
+            <td>{{ tx.confirmed if tx.confirmed else "Unconfirmed" }}</td>
+            <td>{{ (tx.value / 100000000) | round(8) }}</td>
+            <td>
+              {% if tx.tx_input_n is not none and tx.tx_input_n >= 0 %}
+                Sent
+              {% else %}
+                Received
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </table>
+    {% else %}
+      <p>No transactions found.</p>
+    {% endif %}
+    <a href="{{ url_for('index') }}" class="button-link">Back to Home</a>
+  </div>
+
+  <div class="footer">
+    &copy; 2025 Crypto Vault India
+  </div>
+</body>
+</html>

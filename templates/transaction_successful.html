@@ -1,61 +1,95 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Transaction Successful - Crypto Vault India</title>
-    <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            background: #f7f7f7;
-            margin: 0;
-            padding: 0;
-            text-align: center;
-        }
-        header {
-            background-color: #333;
-            color: white;
-            padding: 20px 0;
-            font-size: 24px;
-        }
-        .container {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            margin-top: 50px;
-        }
-        .message {
-            font-size: 18px;
-            color: #4CAF50;
-            margin: 20px 0;
-        }
-        .footer {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            background-color: #333;
-            color: white;
-            padding: 10px;
-            text-align: center;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Transaction Successful - Crypto Vault India</title>
+  <style>
+      body {
+          font-family: 'Arial', sans-serif;
+          background: #f7f7f7;
+          margin: 0;
+          padding: 0;
+          text-align: center;
+      }
+      header {
+          background-color: #333;
+          color: white;
+          padding: 20px 0;
+          font-size: 24px;
+          width: 100%;
+      }
+      h2 {
+          color: #4CAF50;
+          margin: 20px 0;
+          font-size: 32px;
+      }
+      .container {
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          margin: 40px auto;  /* Centers container horizontally */
+          padding: 20px;
+          background: white;
+          border-radius: 8px;
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+          width: 60%;
+          max-width: 500px;
+      }
+      .success-message {
+          color: #28a745;
+          font-size: 18px;
+          margin: 20px 0;
+      }
+      .button-link {
+          background-color: #4CAF50;
+          color: white;
+          text-decoration: none;
+          padding: 15px 30px;
+          margin: 10px 0;
+          border-radius: 5px;
+          font-size: 18px;
+          width: 60%;
+          max-width: 300px;
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+          transition: background-color 0.3s;
+      }
+      .button-link:hover {
+          background-color: #45a049;
+      }
+      .footer {
+          position: fixed;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          background-color: #333;
+          color: white;
+          padding: 10px;
+          text-align: center;
+      }
+  </style>
 </head>
 <body>
-    <header>
-        Crypto Vault India
-    </header>
+  <header>
+      Crypto Vault India
+  </header>
 
-    <h2>Transaction Successful</h2>
+  <h2>Transaction Successful</h2>
 
-    <div class="container">
-        <p class="message">Your Litecoin transaction was successful!</p>
-        <p><a href="/index" style="color: #4CAF50;">Go back to home</a></p>
-    </div>
+  <div class="container">
+      <div class="success-message">
+          <strong>Success!</strong> Your transaction was broadcast successfully.
+          {% if txid %}
+              <br> TXID: <a href="https://live.blockcypher.com/ltc/tx/{{ txid }}/" target="_blank">{{ txid }}</a>
+          {% endif %}
+      </div>
+      <a href="/send" class="button-link">Send Another Transaction</a>
+      <a href="/" class="button-link">Go Back to Dashboard</a>
+  </div>
 
-    <div class="footer">
-        &copy; 2025 Crypto Vault India
-    </div>
+  <div class="footer">
+      &copy; 2025 Crypto Vault India
+  </div>
 </body>
 </html>
-
