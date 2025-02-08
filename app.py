@@ -359,7 +359,7 @@ def send_litecoin():
             flash("Invalid amount.", "error")
             return redirect(url_for("send_litecoin"))
         
-        fee_satoshis = 3000  # Example fee (adjust as needed)
+        fee_satoshis = 5000  # Example fee (adjust as needed)
         
         # Fetch UTXOs for the sender's address from BlockCypher (include script info)
         utxo_url = f"https://api.blockcypher.com/v1/ltc/main/addrs/{user.litecoin_address}?unspentOnly=true&includeScript=true"
