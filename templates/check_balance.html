@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bharat Vault : The Crypto Wallet</title>
+    <title>Bharat Vault : Check Wallet Balance</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -11,10 +11,6 @@
             margin: 0;
             padding: 0;
             text-align: center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            height: 100vh;
         }
         header {
             background-color: #333;
@@ -23,31 +19,29 @@
             font-size: 24px;
             width: 100%;
         }
+        h2 {
+            color: #4CAF50;
+            margin: 20px 0;
+        }
         .container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            margin-top: 5vh; /* Reduced from 10vh to 5vh */
+            margin: 40px auto; /* centers container horizontally */
             padding: 20px;
             background: white;
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             width: 60%;
             max-width: 500px;
-            padding-bottom: 20px;
             font-size: 14px;
-            margin-bottom: 60px;
         }
         .form-label {
-            margin-bottom: 12px;
             font-size: 14px;
             font-weight: bold;
+            margin-bottom: 12px;
         }
         .form-input {
+            width: 100%;
             padding: 12px;
             margin: 12px 0;
-            width: 100%;
             font-size: 14px;
             border: 1px solid #ccc;
             border-radius: 5px;
@@ -67,27 +61,6 @@
         .form-button:hover {
             background-color: #45a049;
         }
-        .footer {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            background-color: #333;
-            color: white;
-            padding: 10px;
-            text-align: center;
-            font-size: 16px;
-        }
-        .alert {
-            padding: 10px;
-            margin-top: 18px;
-            border-radius: 5px;
-            width: 100%;
-            text-align: center;
-        }
-        .alert-danger {
-            background-color: #dc3545;
-            color: white;
-        }
         .go-back {
             display: inline-block;
             margin-top: 18px;
@@ -100,6 +73,28 @@
         .go-back:hover {
             background-color: #0056b3;
         }
+        .alert {
+            padding: 10px;
+            margin-top: 18px;
+            border-radius: 5px;
+            width: 100%;
+            text-align: center;
+        }
+        .alert-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: #333;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            font-size: 16px;
+        }
     </style>
 </head>
 <body>
@@ -108,7 +103,6 @@
     </header>
 
     <div class="container">
-        <!-- Display error message if exists, placed between header and content -->
         {% if error %}
             <div class="alert alert-danger">
                 <strong>Error:</strong> {{ error }}
@@ -117,19 +111,16 @@
 
         <h2>Check Wallet Balance</h2>
 
-        <!-- Form to enter address -->
-        <label for="address" class="form-label">Enter Litecoin Address (Your address balance by default):</label>
         <form action="/check_balance" method="POST">
+            <label for="address" class="form-label">Enter Litecoin Address (Your default address if blank):</label>
             <input type="text" name="address" id="address" value="{{ address or '' }}" placeholder="Enter address" class="form-input">
             <input type="submit" value="Check Balance" class="form-button">
         </form>
 
         {% if balance is not none %}
             <h3>Balance for Address: {{ address }}</h3>
-            <p>Confirmed Balance: <strong>{{ balance }} LTC</strong></p>
-            <p>Unconfirmed Balance: <strong>{{ unconfirmed_balance }} LTC</strong></p>
-
-            <!-- Go back button after balance display -->
+            <p>Confirmed Balance: <strong>{{ balance }} LTC ( {{ balance_inr|default(0)|round(2) }} INR )</strong></p>
+            <p>Unconfirmed Balance: <strong>{{ unconfirmed_balance }} LTC ( {{ unconfirmed_inr|default(0)|round(2) }} INR )</strong></p>
             <a href="/" class="go-back">Go Back to Dashboard</a>
         {% endif %}
     </div>

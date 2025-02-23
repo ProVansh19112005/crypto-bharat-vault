@@ -239,15 +239,30 @@ def home():
 def intro():
     return render_template('intro.html')
 
+import re
+
+def is_valid_email(address):
+    # A simple regex that checks for "something@something.something"
+    pattern = r"^[^@]+@[^@]+\.[^@]+$"
+    return re.match(pattern, address) is not None
+
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
+
+        # 1) Check if username is a valid email
+        if not is_valid_email(username):
+            flash('Username must be a valid email address!', 'error')
+            return redirect(url_for('register'))
+
+        # 2) Proceed if valid
         user = User.query.filter_by(username=username).first()
         if user:
             flash('Username already exists', 'error')
             return redirect(url_for('register'))
+
         print(f"DEBUG: Generating Litecoin wallet for new user {username}...")
         litecoin_address, private_key_wif = create_wallet(wallet_name="wallet_" + username)
         new_user = User(username=username, password=password,
@@ -257,6 +272,7 @@ def register():
         flash('Registration successful. Please log in.', 'success')
         print(f"DEBUG: Wallet generated for user {username} - Address = {litecoin_address}, Private Key = {private_key_wif}")
         return redirect(url_for('login'))
+    
     return render_template('register.html')
 
 @app.route('/check_balance', methods=['GET', 'POST'], endpoint="wallet_balance")
@@ -268,7 +284,9 @@ def check_balance():
     if not address_to_check:
         return render_template('check_balance.html', error="Please enter a Litecoin address.")
     if not is_valid_ltc_address(address_to_check):
-        return render_template('check_balance.html', error="Invalid Litecoin address!", address=address_to_check)
+        # Immediately return error for invalid address.
+        return render_template('check_balance.html', error="Litecoin address is incorrect!", address=address_to_check)
+    
     url = f"https://api.blockcypher.com/v1/ltc/main/addrs/{address_to_check}/balance"
     try:
         response = requests.get(url)
@@ -278,12 +296,30 @@ def check_balance():
             data = response.json()
             balance_ltc = data.get('final_balance', 0) / 1e8
             unconfirmed_ltc = data.get('unconfirmed_balance', 0) / 1e8
-            return render_template('check_balance.html', balance=balance_ltc,
-                                   unconfirmed_balance=unconfirmed_ltc, address=address_to_check)
+
+            # Fetch LTC → INR rate from CoinGecko
+            rate_url = "https://api.coingecko.com/api/v3/simple/price?ids=litecoin&vs_currencies=inr"
+            rate_response = requests.get(rate_url)
+            if rate_response.status_code == 200:
+                rates = rate_response.json().get('litecoin', {})
+                inr_rate = rates.get('inr', 0)
+            else:
+                inr_rate = 0
+
+            balance_inr = balance_ltc * inr_rate
+            unconfirmed_inr = unconfirmed_ltc * inr_rate
+
+            return render_template('check_balance.html', 
+                                   balance=balance_ltc,
+                                   unconfirmed_balance=unconfirmed_ltc,
+                                   balance_inr=balance_inr,
+                                   unconfirmed_inr=unconfirmed_inr,
+                                   address=address_to_check)
         else:
             return render_template('check_balance.html', error="Error fetching balance", address=address_to_check)
     except Exception as e:
         return render_template('check_balance.html', error=str(e), address=address_to_check)
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():

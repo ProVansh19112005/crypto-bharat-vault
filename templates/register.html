@@ -118,7 +118,8 @@
     {% endwith %}
 
     <form method="POST">
-      <input type="text" name="username" placeholder="Username" required>
+      <!-- Use type="email" to enforce a valid email format on modern browsers -->
+      <input type="email" name="username" placeholder="Email Address" required>
       <input type="password" name="password" placeholder="Password" required>
       <button type="submit">Register</button>
     </form>
