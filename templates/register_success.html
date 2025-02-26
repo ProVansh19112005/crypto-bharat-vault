@@ -4,16 +4,74 @@
   <meta charset="UTF-8">
   <title>Registration Successful</title>
   <style>
-    body { font-family: Arial, sans-serif; background: #f7f7f7; text-align: center; margin: 0; padding: 0; }
-    header { background-color: #333; color: white; padding: 20px 0; font-size: 24px; }
-    .container { width: 400px; max-width: 90%; background: #fff; margin: 50px auto; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-    .secret-label { font-size: 20px; margin-bottom: 10px; font-weight: bold; }
-    .secret-input { width: 100%; padding: 10px; font-size: 18px; font-family: "Courier New", Courier, monospace; text-align: center; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 5px; }
-    .copy-btn { background-color: #4CAF50; color: white; border: none; padding: 10px 20px; font-size: 16px; border-radius: 5px; cursor: pointer; margin-bottom: 15px; }
-    .copy-btn:hover { background-color: #45a049; }
-    .warning { color: red; font-weight: bold; margin-top: 15px; margin-bottom: 20px; }
-    .login-link { display: inline-block; padding: 10px 20px; background-color: #4CAF50; color: white; text-decoration: none; border-radius: 5px; }
-    .login-link:hover { background-color: #45a049; }
+    body { 
+      font-family: Arial, sans-serif; 
+      background: #f7f7f7; 
+      text-align: center; 
+      margin: 0; 
+      padding: 0; 
+    }
+    header { 
+      background-color: #333; 
+      color: white; 
+      padding: 20px 0; 
+      font-size: 24px; 
+    }
+    .container { 
+      width: 400px; 
+      max-width: 90%; 
+      background: #fff; 
+      margin: 50px auto; 
+      padding: 20px; 
+      border-radius: 8px; 
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1); 
+    }
+    .secret-label { 
+      font-size: 20px; 
+      margin-bottom: 10px; 
+      font-weight: bold; 
+    }
+    .secret-input { 
+      width: 70%;           /* Reduced to 70% */
+      padding: 10px; 
+      font-size: 18px; 
+      font-family: "Courier New", Courier, monospace; 
+      text-align: center; 
+      margin: 12px auto;    /* Auto margin centers the box */
+      border: 1px solid #ccc; 
+      border-radius: 5px; 
+      display: block;       /* Ensures it takes full width as defined */
+    }
+    .copy-btn { 
+      background-color: #4CAF50; 
+      color: white; 
+      border: none; 
+      padding: 10px 20px; 
+      font-size: 16px; 
+      border-radius: 5px; 
+      cursor: pointer; 
+      margin-bottom: 15px; 
+    }
+    .copy-btn:hover { 
+      background-color: #45a049; 
+    }
+    .warning { 
+      color: red; 
+      font-weight: bold; 
+      margin-top: 15px; 
+      margin-bottom: 20px; 
+    }
+    .login-link { 
+      display: inline-block; 
+      padding: 10px 20px; 
+      background-color: #4CAF50; 
+      color: white; 
+      text-decoration: none; 
+      border-radius: 5px; 
+    }
+    .login-link:hover { 
+      background-color: #45a049; 
+    }
   </style>
   <script>
     function copySecretCode() {
@@ -37,4 +95,3 @@
   </div>
 </body>
 </html>
-
