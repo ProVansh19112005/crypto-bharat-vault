@@ -1,113 +1,124 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Bharat Vault : The Crypto Wallet</title>
-    <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            background: #f7f7f7;
-            margin: 0;
-            padding: 0;
-            text-align: center;
-        }
-        header {
-            background-color: #333;
-            color: white;
-            padding: 20px 0;
-            font-size: 24px;
-        }
-        h1 {
-            margin: 20px 0;
-            color: #4CAF50;
-            font-size: 36px;
-        }
-        .container {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            margin-top: 40px;
-        }
-        input {
-            padding: 15px;
-            font-size: 18px;
-            margin: 10px;
-            border-radius: 5px;
-            width: 60%;
-            max-width: 300px;
-        }
-        .button-link {
-            background-color: #4CAF50;
-            color: white;
-            text-decoration: none;
-            padding: 15px 30px;
-            margin: 10px;
-            border-radius: 5px;
-            font-size: 18px;
-            width: 60%;
-            max-width: 300px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            transition: background-color 0.3s;
-        }
-        .button-link:hover {
-            background-color: #45a049;
-        }
-        /* Flash messages styling */
-        .flash-messages {
-            list-style: none;
-            padding: 0;
-            margin: 20px auto;
-            max-width: 300px;
-            text-align: left;
-        }
-        .flash-messages li {
-            padding: 10px;
-            margin-bottom: 10px;
-            border-radius: 5px;
-        }
-        .flash-messages .error {
-            background-color: #f8d7da;
-            color: #721c24;
-        }
-        .flash-messages .success {
-            background-color: #d4edda;
-            color: #155724;
-        }
-        .flash-messages .info {
-            background-color: #d1ecf1;
-            color: #0c5460;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Login - Bharat Vault : The Crypto Wallet</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background: #f7f7f7;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+    }
+    header {
+      background-color: #333;
+      color: white;
+      padding: 20px 0;
+      font-size: 24px;
+    }
+    h1 {
+      margin: 20px 0;
+      color: #4CAF50;
+      font-size: 36px;
+    }
+    .container {
+      display: flex;
+      flex-direction: column;  /* stack items vertically */
+      align-items: center;     /* center horizontally */
+      margin-top: 40px;
+    }
+    /* Form container: sets a max width and centers horizontally */
+    form {
+      display: flex;
+      flex-direction: column;  /* vertical stacking of inputs */
+      align-items: center;     /* center each input horizontally */
+      max-width: 300px;        /* optional: limit the form width */
+      width: 100%;
+      margin: 0 auto;
+    }
+    /* Style for inputs: stack with spacing and full width of the form container */
+    form input {
+      margin: 10px 0;
+      padding: 15px;
+      font-size: 18px;
+      border-radius: 5px;
+      width: 100%; /* fill the form's width (max-width: 300px) */
+    }
+    /* Style for the Register button-link */
+    .button-link {
+      background-color: #4CAF50;
+      color: white;
+      text-decoration: none;
+      padding: 15px 30px;
+      margin: 10px 0;
+      border-radius: 5px;
+      font-size: 18px;
+      width: auto;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      transition: background-color 0.3s;
+      display: inline-block;
+    }
+    .button-link:hover {
+      background-color: #45a049;
+    }
+    /* Flash messages styling (optional) */
+    .flash-messages {
+      list-style: none;
+      padding: 0;
+      margin: 20px auto;
+      max-width: 300px;
+      text-align: left;
+    }
+    .flash-messages li {
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 5px;
+    }
+    .flash-messages .error {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+    .flash-messages .success {
+      background-color: #d4edda;
+      color: #155724;
+    }
+    .flash-messages .info {
+      background-color: #d1ecf1;
+      color: #0c5460;
+    }
+  </style>
 </head>
 <body>
-    <header>
-        Login - Bharat Vault : The Crypto Wallet
-    </header>
+  <header>
+    Login - Bharat Vault : The Crypto Wallet
+  </header>
 
-    <h1>Login</h1>
+  <h1>Login</h1>
 
-    <div class="container">
-        <!-- Flash messages block -->
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                <ul class="flash-messages">
-                    {% for category, message in messages %}
-                        <li class="{{ category }}">{{ message }}</li>
-                    {% endfor %}
-                </ul>
-            {% endif %}
-        {% endwith %}
+  <div class="container">
+    <!-- Flash messages block -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <ul class="flash-messages">
+          {% for category, message in messages %}
+            <li class="{{ category }}">{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
 
-        <form method="POST">
-            <input type="text" name="username" placeholder="Username" required>
-            <input type="password" name="password" placeholder="Password" required>
-            <input type="submit" value="Login">
-        </form>
+    <form method="POST">
+      <input type="text" name="username" placeholder="Username" required>
+      <input type="password" name="password" placeholder="Password" required>
+      <input type="text" name="secret_code" placeholder="Secret Code" required>
+      <input type="submit" value="Login">
+    </form>
 
-        <p>Don't have an account? <a href="/register" class="button-link">Register</a></p>
-    </div>
+    <p>Don't have an account? 
+      <a href="/register" class="button-link">Register</a>
+    </p>
+  </div>
 </body>
 </html>
-
