@@ -373,7 +373,7 @@ def send_litecoin():
         except Exception as e:
             flash("Invalid amount.", "error")
             return redirect(url_for("send_litecoin"))
-        fee_satoshis = 5000
+        fee_satoshis = 10000
         utxo_url = f"https://api.blockcypher.com/v1/ltc/main/addrs/{user.litecoin_address}?unspentOnly=true&includeScript=true"
         utxo_resp = requests.get(utxo_url)
         if utxo_resp.status_code != 200:
