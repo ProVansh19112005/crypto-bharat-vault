@@ -1,103 +1,96 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bharat Vault : The Crypto Wallet</title>
-    <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            background: #f7f7f7;
-            margin: 0;
-            padding: 0;
-            text-align: center;
-        }
-        header {
-            background-color: #333;
-            color: white;
-            padding: 20px 0;
-            font-size: 24px;
-        }
-        h1 {
-            margin: 20px 0;
-            color: #4CAF50;
-            font-size: 36px;
-        }
-        .container {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            margin-top: 40px;
-        }
-        .button-link {
-            background-color: #4CAF50;
-            color: white;
-            text-decoration: none;
-            padding: 15px 30px;
-            margin: 10px 0;
-            border-radius: 5px;
-            font-size: 18px;
-            width: 60%;
-            max-width: 300px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            transition: background-color 0.3s;
-        }
-        .button-link:hover {
-            background-color: #45a049;
-        }
-        .logout-btn {
-            background-color: red;
-            color: white;
-            padding: 10px 25px;
-            font-size: 18px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            width: auto;
-            margin-top: 20px;
-            transition: background-color 0.3s;
-        }
-        .logout-btn:hover {
-            background-color: #cc0000; /* Darker red on hover */
-        }
-        .footer {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            background-color: #333;
-            color: white;
-            padding: 10px;
-            text-align: center;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bharat Vault : The Crypto Wallet</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f7f7f7;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+    }
+    header {
+      background-color: #333;
+      color: white;
+      padding: 20px 0;
+      font-size: 24px;
+    }
+    h1 {
+      margin: 20px 0;
+      color: #4CAF50;
+      font-size: 36px;
+    }
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 40px;
+    }
+    /* All main button links have a fixed width for uniformity */
+    .button-link {
+      background-color: #4CAF50;
+      color: white;
+      text-decoration: none;
+      padding: 15px 30px;
+      margin: 10px;
+      border-radius: 5px;
+      font-size: 18px;
+      width: 300px; /* Uniform width for main links */
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      transition: background-color 0.3s;
+      display: inline-block;
+    }
+    .button-link:hover {
+      background-color: #45a049;
+    }
+    /* Logout button now sizes based on padding only */
+    .logout-btn {
+      background-color: red;
+      color: white;
+      padding: 15px 30px;
+      font-size: 18px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 20px;
+      transition: background-color 0.3s;
+      /* No fixed width here so it appears smaller */
+    }
+    .logout-btn:hover {
+      background-color: #cc0000;
+    }
+    footer {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      background-color: #333;
+      color: white;
+      padding: 10px;
+      text-align: center;
+    }
+  </style>
 </head>
 <body>
-    <header>
-        Bharat Vault : The Crypto Wallet
-    </header>
-
-    <h1>Welcome, {{ user.username }}</h1>
-
-    <div class="container">
-        <a href="/create_wallet" class="button-link">Create Wallet</a>
-        <a href="/send" class="button-link">Send Litecoin</a>
-        <a href="{{ url_for('wallet_balance') }}" class="button-link">Check Wallet Balance</a>
-        <!-- New Transaction History Button -->
-        <a href="/history" class="button-link">Transaction History</a>
-        
-        <!-- Logout button -->
-        <a href="{{ url_for('logout') }}">
-            <button class="logout-btn">Logout</button>
-        </a>
-    </div>
-
-    <div class="footer">
-        &copy; 2025 Bharat Vault : The Crypto Wallet
-    </div>
+  <header>
+    Bharat Vault : The Crypto Wallet
+  </header>
+  <h1>Welcome, {{ user.username }}</h1>
+  <div class="container">
+    <a href="{{ url_for('create_wallet_route') }}" class="button-link">Create Wallet</a>
+    <a href="{{ url_for('send_litecoin') }}" class="button-link">Send Litecoin</a>
+    <a href="{{ url_for('wallet_balance') }}" class="button-link">Check Wallet Balance</a>
+    <a href="{{ url_for('history') }}" class="button-link">Transaction History</a>
+    <!-- New Enable 2FA button below Transaction History -->
+    <a href="{{ url_for('enable_2fa') }}" class="button-link">Enable Two-Factor Authentication</a>
+    <a href="{{ url_for('logout') }}">
+      <button class="logout-btn">Logout</button>
+    </a>
+  </div>
+  <footer>
+    &copy; 2025 Bharat Vault : The Crypto Wallet
+  </footer>
 </body>
 </html>
-
-
-
-

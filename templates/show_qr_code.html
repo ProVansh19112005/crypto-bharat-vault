@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Scan QR Code - Bharat Vault</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f7f7f7;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: #333;
+      color: white;
+      padding: 20px 0;
+      font-size: 24px;
+      width: 100%;
+    }
+    .container {
+      width: 400px;
+      max-width: 90%;
+      background: #fff;
+      margin: 50px auto;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    img {
+      width: 70%; /* Reduced size to 70% of container width */
+      height: auto;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      margin: 10px 0;
+    }
+    a {
+      display: inline-block;
+      margin-top: 15px;
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+    }
+    a:hover {
+      background-color: #45a049;
+    }
+    .footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background-color: #333;
+      color: white;
+      padding: 10px;
+      text-align: center;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <header>Bharat Vault : Scan QR Code</header>
+  <div class="container">
+    <h2>Scan this QR Code</h2>
+    <p>Open Google Authenticator and scan this code.</p>
+    <img src="data:image/png;base64,{{ qr_code }}" alt="QR Code">
+    <a href="{{ url_for('index') }}">Back to Dashboard</a>
+  </div>
+  <div class="footer">
+    &copy; 2025 Bharat Vault : The Crypto Wallet
+  </div>
+</body>
+</html>
+

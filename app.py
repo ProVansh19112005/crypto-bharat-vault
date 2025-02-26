@@ -15,11 +15,16 @@ import hashlib
 import secrets
 import string
 
+# Import libraries for 2FA
+import pyotp
+import qrcode
+from io import BytesIO
+import base64
+
 # --- Monkey-patch bitcoinlib's DbTransactionOutput if needed ---
 try:
     from bitcoinlib.transactions import DbTransactionOutput
     if not hasattr(DbTransactionOutput, '_sa_instance_state'):
-        # Provide a dummy _sa_instance_state property so that attribute checks pass.
         DbTransactionOutput._sa_instance_state = property(lambda self: None)
 except Exception:
     pass
@@ -42,32 +47,26 @@ app.config['SECRET_KEY'] = os.getenv("SECRET_KEY", "fallback-secret-key")
 Session(app)
 db = SQLAlchemy(app)
 
-# Define User model (updated with secret_code field)
+# Define User model (updated with secret_code and totp_secret fields)
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100), unique=True, nullable=False)
     password = db.Column(db.String(100), nullable=False)
     litecoin_address = db.Column(db.String(100), unique=True, nullable=False)
     private_key = db.Column(db.String(200), nullable=True)  # Stored WIF
-    secret_code = db.Column(db.String(12), nullable=False)  # 12-letter secret code
+    secret_code = db.Column(db.String(12), nullable=False)   # 12-letter secret code
+    totp_secret = db.Column(db.String(32), nullable=True)      # TOTP secret for 2FA
 
 # --------------------------
 # Helper: Generate 12-letter Secret Code
 # --------------------------
 def generate_secret_code(length=12):
-    # Generates a random secret code consisting of uppercase and lowercase letters
     return ''.join(secrets.choice(string.ascii_letters) for _ in range(length))
 
 # --------------------------
 # Helper: Validate Litecoin Address
 # --------------------------
 def is_valid_ltc_address(address):
-    """
-    Basic validation for a Litecoin mainnet address.
-    Accepts:
-      - Legacy addresses starting with "L" or "M" (34 characters)
-      - Bech32 addresses starting with "ltc1" (26 to 90 characters)
-    """
     if (address.startswith("L") or address.startswith("M")) and len(address) == 34:
         return True
     if address.startswith("ltc1") and 26 <= len(address) <= 90:
@@ -78,11 +77,6 @@ def is_valid_ltc_address(address):
 # Helper: Convert WIF to SigningKey
 # --------------------------
 def wif_to_signing_key(wif):
-    """
-    Convert a Litecoin WIF private key to an ECDSA SigningKey.
-    This function supports both standard WIF (expected length 34 bytes after base58
-    decoding) and extended private keys (BIP32) that are longer.
-    """
     decoded = base58.b58decode_check(wif)
     if len(decoded) == 34:
         priv_key_bytes = decoded[1:]
@@ -104,11 +98,9 @@ def wif_to_signing_key(wif):
 # Helper functions for manual transaction construction & signing
 # --------------------------------------------------------------------
 def int_to_little_endian(n, length):
-    """Convert an integer to little-endian bytes of specified length."""
     return n.to_bytes(length, byteorder='little')
 
 def varint(n):
-    """Encode an integer as a Bitcoin-style varint."""
     if n < 0xfd:
         return n.to_bytes(1, byteorder='little')
     elif n <= 0xffff:
@@ -119,27 +111,17 @@ def varint(n):
         return b'\xff' + n.to_bytes(8, byteorder='little')
 
 def address_to_pubkey_hash(address):
-    """
-    Convert a Base58Check Litecoin address (legacy P2PKH) to its 20-byte hash160.
-    Assumes the address is valid.
-    """
     decoded = base58.b58decode_check(address)
     return decoded[1:]
 
 def p2pkh_script(pubkey_hash):
-    """
-    Build a standard P2PKH scriptPubKey.
-    """
     return b'\x76\xa9\x14' + pubkey_hash + b'\x88\xac'
 
 def create_signed_transaction(utxo, recipient_address, amount, fee, change_address, priv_key_wif):
-    """
-    Build and sign a raw Litecoin transaction using one UTXO.
-    """
     total_in = utxo["value"]
     change = total_in - amount - fee
     if change < 0:
-        return None  # insufficient funds
+        return None
 
     version = int_to_little_endian(1, 4)
     locktime = int_to_little_endian(0, 4)
@@ -205,26 +187,25 @@ def intro():
     return render_template('intro.html')
 
 import re
-
 def is_valid_email(address):
     pattern = r"^[^@]+@[^@]+\.[^@]+$"
     return re.match(pattern, address) is not None
 
+# Registration Route: Generates wallet, secret code, and renders a success page.
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-
-        # (Validate email, check if user exists, etc.)
-
-        # Generate wallet
+        if not is_valid_email(username):
+            flash('Username must be a valid email address!', 'error')
+            return redirect(url_for('register'))
+        user = User.query.filter_by(username=username).first()
+        if user:
+            flash('Username already exists', 'error')
+            return redirect(url_for('register'))
         litecoin_address, private_key_wif = create_wallet(wallet_name="wallet_" + username)
-
-        # Generate a random 12-letter secret code
         secret_code = generate_secret_code(12)
-
-        # Create and store user
         new_user = User(
             username=username,
             password=password,
@@ -234,14 +215,10 @@ def register():
         )
         db.session.add(new_user)
         db.session.commit()
-
-        # Instead of flashing the code and redirecting,
-        # we render a page that shows the code and a copy button.
         return render_template('register_success.html', secret_code=secret_code)
-
     return render_template('register.html')
 
-
+# Check Balance Route – now explicitly given the endpoint "wallet_balance"
 @app.route('/check_balance', methods=['GET', 'POST'], endpoint="wallet_balance")
 def check_balance():
     address_to_check = request.form.get('address')
@@ -252,39 +229,28 @@ def check_balance():
         return render_template('check_balance.html', error="Please enter a Litecoin address.")
     if not is_valid_ltc_address(address_to_check):
         return render_template('check_balance.html', error="Litecoin address is incorrect!", address=address_to_check)
-    
     url = f"https://api.blockcypher.com/v1/ltc/main/addrs/{address_to_check}/balance"
     try:
         response = requests.get(url)
-        print(f"API Status Code: {response.status_code}")
-        print(f"API Response: {response.text}")
         if response.status_code == 200:
             data = response.json()
             balance_ltc = data.get('final_balance', 0) / 1e8
             unconfirmed_ltc = data.get('unconfirmed_balance', 0) / 1e8
-
             rate_url = "https://api.coingecko.com/api/v3/simple/price?ids=litecoin&vs_currencies=inr"
             rate_response = requests.get(rate_url)
-            if rate_response.status_code == 200:
-                rates = rate_response.json().get('litecoin', {})
-                inr_rate = rates.get('inr', 0)
-            else:
-                inr_rate = 0
-
-            balance_inr = balance_ltc * inr_rate
-            unconfirmed_inr = unconfirmed_ltc * inr_rate
-
+            inr_rate = rate_response.json().get('litecoin', {}).get('inr', 0) if rate_response.status_code == 200 else 0
             return render_template('check_balance.html', 
                                    balance=balance_ltc,
                                    unconfirmed_balance=unconfirmed_ltc,
-                                   balance_inr=balance_inr,
-                                   unconfirmed_inr=unconfirmed_inr,
+                                   balance_inr=balance_ltc * inr_rate,
+                                   unconfirmed_inr=unconfirmed_ltc * inr_rate,
                                    address=address_to_check)
         else:
             return render_template('check_balance.html', error="Error fetching balance", address=address_to_check)
     except Exception as e:
         return render_template('check_balance.html', error=str(e), address=address_to_check)
 
+# Login Route with secret code and 2FA check
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -293,11 +259,67 @@ def login():
         secret_code_input = request.form['secret_code']
         user = User.query.filter_by(username=username).first()
         if user and user.password == password and user.secret_code == secret_code_input:
-            session['user_id'] = user.id
-            return redirect(url_for('index'))
+            if user.totp_secret:
+                session['pending_2fa_user_id'] = user.id
+                return redirect(url_for('two_factor_auth'))
+            else:
+                session['user_id'] = user.id
+                return redirect(url_for('index'))
         else:
             flash("Invalid credentials or secret code, please try again.", "error")
     return render_template('login.html')
+
+# Two-Factor Authentication Verification Route
+@app.route('/two_factor_auth', methods=['GET', 'POST'])
+def two_factor_auth():
+    pending_user_id = session.get('pending_2fa_user_id')
+    if not pending_user_id:
+        return redirect(url_for('login'))
+    user = User.query.get(pending_user_id)
+    if request.method == 'POST':
+        totp_code = request.form['totp_code']
+        totp = pyotp.TOTP(user.totp_secret)
+        if totp.verify(totp_code):
+            session.pop('pending_2fa_user_id', None)
+            session['user_id'] = user.id
+            return redirect(url_for('index'))
+        else:
+            flash("Invalid 2FA code, please try again.", "error")
+            # Instead of redirecting, re-render the two_factor_auth page so the flash message appears here.
+            return render_template('two_factor_auth.html')
+    return render_template('two_factor_auth.html')
+
+# Enable 2FA Route
+@app.route('/enable_2fa', methods=['GET', 'POST'])
+def enable_2fa():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    user = User.query.get(session['user_id'])
+    if request.method == 'POST':
+        user.totp_secret = pyotp.random_base32()
+        db.session.commit()
+        return redirect(url_for('show_qr_code'))
+    return render_template('enable_2fa.html')
+
+# Show QR Code Route for 2FA
+@app.route('/show_qr_code')
+def show_qr_code():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    user = User.query.get(session['user_id'])
+    if not user.totp_secret:
+        flash('2FA is not enabled for your account.', 'error')
+        return redirect(url_for('enable_2fa'))
+    issuer_name = "BharatVault"
+    totp_uri = pyotp.TOTP(user.totp_secret).provisioning_uri(name=user.username, issuer_name=issuer_name)
+    qr = qrcode.QRCode(version=1, box_size=10, border=5)
+    qr.add_data(totp_uri)
+    qr.make(fit=True)
+    img = qr.make_image(fill_color="black", back_color="white")
+    buffered = BytesIO()
+    img.save(buffered, format="PNG")
+    img_str = base64.b64encode(buffered.getvalue()).decode()
+    return render_template('show_qr_code.html', qr_code=img_str)
 
 @app.route('/logout')
 def logout():
@@ -332,30 +354,21 @@ def send_litecoin():
     if 'user_id' not in session:
         return redirect(url_for('login'))
     user = User.query.get(session['user_id'])
-    
     if not user.litecoin_address:
         flash("No wallet found. Please create one.", "error")
         return redirect(url_for("create_wallet_route"))
-    
     if request.method == 'POST':
         recipient_address = request.form.get('recipient_address')
         amount_ltc = request.form.get('amount')
-        
-        print("Received POST request")
-        print(f"Recipient: {recipient_address}, Amount: {amount_ltc}")
-        
         if not recipient_address or not amount_ltc:
             flash("Enter recipient address and amount.", "error")
             return redirect(url_for("send_litecoin"))
-        
         try:
             amount_satoshis = int(Decimal(amount_ltc) * 100_000_000)
         except Exception as e:
             flash("Invalid amount.", "error")
             return redirect(url_for("send_litecoin"))
-        
         fee_satoshis = 5000
-        
         utxo_url = f"https://api.blockcypher.com/v1/ltc/main/addrs/{user.litecoin_address}?unspentOnly=true&includeScript=true"
         utxo_resp = requests.get(utxo_url)
         if utxo_resp.status_code != 200:
@@ -365,7 +378,6 @@ def send_litecoin():
         if "txrefs" not in utxo_data or len(utxo_data["txrefs"]) == 0:
             error_msg = "No UTXOs available."
             return render_template("transaction_failure.html", error=error_msg)
-        
         selected_utxo = None
         for utxo in utxo_data["txrefs"]:
             if utxo["value"] >= amount_satoshis + fee_satoshis:
@@ -374,7 +386,6 @@ def send_litecoin():
         if selected_utxo is None:
             error_msg = "No UTXO with sufficient funds."
             return render_template("transaction_failure.html", error=error_msg)
-        
         raw_tx = create_signed_transaction(
             selected_utxo,
             recipient_address,
@@ -386,18 +397,15 @@ def send_litecoin():
         if raw_tx is None:
             error_msg = "Failed to create raw transaction."
             return render_template("transaction_failure.html", error=error_msg)
-        
         push_url = "https://api.blockcypher.com/v1/ltc/main/txs/push"
         push_data = {"tx": raw_tx}
         push_resp = requests.post(push_url, json=push_data)
         if push_resp.status_code not in (200, 201):
             error_msg = "Broadcast failed: " + push_resp.text
             return render_template("transaction_failure.html", error=error_msg)
-        
         tx_info = push_resp.json()
         txid = tx_info.get("tx", {}).get("hash", "unknown")
         return redirect(url_for("transaction_successful", txid=txid))
-    
     return render_template('send_litecoin.html', user=user)
 
 @app.route('/transaction_successful')

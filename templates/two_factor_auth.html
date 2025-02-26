@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Two-Factor Authentication - Bharat Vault</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f7f7f7;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: #333;
+      color: white;
+      padding: 20px 0;
+      font-size: 24px;
+    }
+    .container {
+      width: 400px;
+      max-width: 90%;
+      background: #fff;
+      margin: 50px auto;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    input, button {
+      width: 100%;
+      padding: 15px;
+      font-size: 18px;
+      border-radius: 5px;
+      margin: 10px 0;
+      box-sizing: border-box;
+    }
+    input {
+      border: 1px solid #ccc;
+    }
+    button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    .flash-messages {
+      list-style: none;
+      padding: 0;
+      margin-bottom: 10px;
+    }
+    .flash-messages li {
+      padding: 10px;
+      margin-bottom: 5px;
+      border-radius: 5px;
+    }
+    .flash-messages .error {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+    a {
+      display: inline-block;
+      margin-top: 15px;
+      text-decoration: none;
+      color: #4CAF50;
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+  <header>Bharat Vault : Two-Factor Authentication</header>
+  <div class="container">
+    <h2>Enter Your 2FA Code</h2>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <ul class="flash-messages">
+          {% for category, message in messages %}
+            <li class="{{ category }}">{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+    <form method="POST">
+      <input type="text" name="totp_code" placeholder="Enter 6-digit code" required>
+      <button type="submit">Verify</button>
+    </form>
+    <a href="{{ url_for('index') }}">Back to Dashboard</a>
+  </div>
+</body>
+</html>

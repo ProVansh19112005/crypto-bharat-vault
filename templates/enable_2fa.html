@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Enable Two-Factor Authentication - Bharat Vault</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f7f7f7;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: #333;
+      color: white;
+      padding: 20px 0;
+      font-size: 24px;
+      width: 100%;
+    }
+    .container {
+      width: 400px;
+      max-width: 90%;
+      background: #fff;
+      margin: 50px auto;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      font-size: 18px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      width: 100%;
+      margin-top: 10px;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    a {
+      text-decoration: none;
+      color: #4CAF50;
+      font-size: 18px;
+      display: inline-block;
+      margin-top: 15px;
+    }
+    .footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background-color: #333;
+      color: white;
+      padding: 10px;
+      text-align: center;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <header>Bharat Vault : Enable 2FA</header>
+  <div class="container">
+    <h2>Enable Two-Factor Authentication</h2>
+    <p>Click the button below to enable 2FA for your account.</p>
+    <form method="POST">
+      <button type="submit">Enable 2FA</button>
+    </form>
+    <a href="{{ url_for('index') }}">Back to Dashboard</a>
+  </div>
+  <div class="footer">
+    &copy; 2025 Bharat Vault : The Crypto Wallet
+  </div>
+</body>
+</html>

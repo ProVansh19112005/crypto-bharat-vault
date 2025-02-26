@@ -1,85 +1,25 @@
-<!-- templates/register_success.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>Registration Successful</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f7f7f7;
-      margin: 0; 
-      padding: 0;
-      text-align: center;
-    }
-    header {
-      background-color: #333;
-      color: white;
-      padding: 20px 0;
-      font-size: 24px;
-    }
-    .container {
-      background-color: #fff;
-      margin: 50px auto;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      width: 90%;
-      max-width: 400px;
-      text-align: center;
-    }
-    .secret-label {
-      font-size: 20px;
-      margin-bottom: 10px;
-      font-weight: bold;
-    }
-    .secret-input {
-      width: 100%;
-      padding: 10px;
-      font-size: 16px;
-      text-align: center;
-      margin-bottom: 15px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-    }
-    .copy-btn {
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      font-size: 16px;
-      border-radius: 5px;
-      cursor: pointer;
-      margin-bottom: 15px;
-    }
-    .copy-btn:hover {
-      background-color: #45a049;
-    }
-    .warning {
-      color: red;
-      font-weight: bold;
-      margin-top: 15px;
-      margin-bottom: 20px;
-    }
-    .login-link {
-      display: inline-block;
-      padding: 10px 20px;
-      background-color: #4CAF50;
-      color: white;
-      text-decoration: none;
-      border-radius: 5px;
-      margin-top: 10px;
-    }
-    .login-link:hover {
-      background-color: #45a049;
-    }
+    body { font-family: Arial, sans-serif; background: #f7f7f7; text-align: center; margin: 0; padding: 0; }
+    header { background-color: #333; color: white; padding: 20px 0; font-size: 24px; }
+    .container { width: 400px; max-width: 90%; background: #fff; margin: 50px auto; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+    .secret-label { font-size: 20px; margin-bottom: 10px; font-weight: bold; }
+    .secret-input { width: 100%; padding: 10px; font-size: 18px; font-family: "Courier New", Courier, monospace; text-align: center; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 5px; }
+    .copy-btn { background-color: #4CAF50; color: white; border: none; padding: 10px 20px; font-size: 16px; border-radius: 5px; cursor: pointer; margin-bottom: 15px; }
+    .copy-btn:hover { background-color: #45a049; }
+    .warning { color: red; font-weight: bold; margin-top: 15px; margin-bottom: 20px; }
+    .login-link { display: inline-block; padding: 10px 20px; background-color: #4CAF50; color: white; text-decoration: none; border-radius: 5px; }
+    .login-link:hover { background-color: #45a049; }
   </style>
-
   <script>
     function copySecretCode() {
       const codeField = document.getElementById("secretCode");
       codeField.select();
-      codeField.setSelectionRange(0, 99999); // for mobile devices
+      codeField.setSelectionRange(0, 99999);
       document.execCommand("copy");
       alert("Secret code copied to clipboard!");
     }
@@ -87,23 +27,14 @@
 </head>
 <body>
   <header>Bharat Vault : Registration Successful</header>
-
   <div class="container">
     <h2>Your Account Has Been Created!</h2>
-    
     <div class="secret-label">Your Secret Code</div>
-    <input
-      type="text"
-      id="secretCode"
-      class="secret-input"
-      value="{{ secret_code }}"
-      readonly
-    >
+    <input type="text" id="secretCode" class="secret-input" value="{{ secret_code }}" readonly>
     <button class="copy-btn" onclick="copySecretCode()">Copy Code</button>
-
     <p class="warning">Store this code securely! If you lose it, you lose access to your account.</p>
-
     <a href="{{ url_for('login') }}" class="login-link">Go to Login</a>
   </div>
 </body>
 </html>
+
