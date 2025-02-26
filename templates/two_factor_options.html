@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Two-Factor Options - Bharat Vault</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f7f7f7;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: #333;
+      color: white;
+      padding: 20px 0;
+      font-size: 24px;
+      width: 100%;
+    }
+    .container {
+      width: 400px;
+      max-width: 90%;
+      background: #fff;
+      margin: 50px auto;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .title {
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 15px;
+    }
+    .big-button {
+      background-color: #4CAF50;
+      color: white;
+      padding: 15px 30px;
+      margin: 10px 0;
+      border-radius: 5px;
+      font-size: 18px;
+      width: 300px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      text-decoration: none;
+      text-align: center;
+      transition: background-color 0.3s;
+      display: inline-block;
+      border: none;
+      cursor: pointer;
+    }
+    .big-button:hover {
+      background-color: #45a049;
+    }
+    a {
+      text-decoration: none;
+      color: #4CAF50;
+      font-size: 16px;
+      margin-top: 15px;
+      display: inline-block;
+    }
+    .flash-messages {
+      list-style: none;
+      padding: 0;
+      margin-bottom: 15px;
+    }
+    .flash-messages li {
+      padding: 10px;
+      margin-bottom: 5px;
+      border-radius: 5px;
+    }
+    .flash-messages .success {
+      background-color: #d4edda;
+      color: #155724;
+    }
+    .flash-messages .error {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+    .footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background-color: #333;
+      color: white;
+      padding: 10px;
+      text-align: center;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <header>Bharat Vault : Two-Factor Authentication</header>
+  <div class="container">
+    <div class="title">Two-Factor Authentication Options</div>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <ul class="flash-messages">
+          {% for category, message in messages %}
+            <li class="{{ category }}">{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+    <form action="{{ url_for('enable_2fa') }}" method="POST" style="margin: 0;">
+      <button type="submit" class="big-button">Enable 2FA</button>
+    </form>
+    <form action="{{ url_for('disable_2fa') }}" method="POST" style="margin: 0;">
+      <button type="submit" class="big-button">Disable 2FA</button>
+    </form>
+    <a href="{{ url_for('index') }}">Back to Dashboard</a>
+  </div>
+  <div class="footer">
+    &copy; 2025 Bharat Vault : The Crypto Wallet
+  </div>
+</body>
+</html>

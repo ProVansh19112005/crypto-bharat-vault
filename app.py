@@ -47,7 +47,7 @@ app.config['SECRET_KEY'] = os.getenv("SECRET_KEY", "fallback-secret-key")
 Session(app)
 db = SQLAlchemy(app)
 
-# Define User model (updated with secret_code and totp_secret fields)
+# Define User model (with secret_code and totp_secret fields)
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100), unique=True, nullable=False)
@@ -55,7 +55,7 @@ class User(db.Model):
     litecoin_address = db.Column(db.String(100), unique=True, nullable=False)
     private_key = db.Column(db.String(200), nullable=True)  # Stored WIF
     secret_code = db.Column(db.String(12), nullable=False)   # 12-letter secret code
-    totp_secret = db.Column(db.String(32), nullable=True)      # TOTP secret for 2FA
+    totp_secret = db.Column(db.String(32), nullable=True)    # TOTP secret for 2FA
 
 # --------------------------
 # Helper: Generate 12-letter Secret Code
@@ -89,7 +89,6 @@ def wif_to_signing_key(wif):
             priv_key_bytes = decoded[-32:]
     else:
         priv_key_bytes = decoded
-
     if len(priv_key_bytes) != 32:
         raise ValueError(f"Invalid private key length: {len(priv_key_bytes)}; expected 32")
     return SigningKey.from_string(priv_key_bytes, curve=SECP256k1)
@@ -122,24 +121,19 @@ def create_signed_transaction(utxo, recipient_address, amount, fee, change_addre
     change = total_in - amount - fee
     if change < 0:
         return None
-
     version = int_to_little_endian(1, 4)
     locktime = int_to_little_endian(0, 4)
-    
     txid = bytes.fromhex(utxo["tx_hash"])[::-1]
     vout = int_to_little_endian(utxo["tx_output_n"], 4)
     sequence = bytes.fromhex("ffffffff")
-    
     script_pubkey = bytes.fromhex(utxo["script"])
     script_length = varint(len(script_pubkey))
     txin_for_sign = txid + vout + script_length + script_pubkey + sequence
-
     recipient_pubkey_hash = address_to_pubkey_hash(recipient_address)
     recipient_script = p2pkh_script(recipient_pubkey_hash)
     recipient_value = int_to_little_endian(amount, 8)
     recipient_script_length = varint(len(recipient_script))
     txout_recipient = recipient_value + recipient_script_length + recipient_script
-
     txout_change = b""
     if change > 0:
         change_pubkey_hash = address_to_pubkey_hash(change_address)
@@ -147,28 +141,21 @@ def create_signed_transaction(utxo, recipient_address, amount, fee, change_addre
         change_value = int_to_little_endian(change, 8)
         change_script_length = varint(len(change_script))
         txout_change = change_value + change_script_length + change_script
-
     output_count = 2 if change > 0 else 1
     txout = txout_recipient + txout_change
-
     txin_count = varint(1)
     txout_count = varint(output_count)
-
     pre_tx = version + txin_count + txin_for_sign + txout_count + txout + locktime
     hash_type = int_to_little_endian(1, 4)
     pre_tx_for_sign = pre_tx + hash_type
-
     sighash = hashlib.sha256(hashlib.sha256(pre_tx_for_sign).digest()).digest()
-
     signing_key = wif_to_signing_key(priv_key_wif)
     signature = signing_key.sign_digest(sighash, sigencode=ecdsa.util.sigencode_der) + b'\x01'
-
     verifying_key = signing_key.get_verifying_key()
     pubkey = verifying_key.to_string("compressed")
     script_sig = (len(signature).to_bytes(1, byteorder='little') + signature +
                   len(pubkey).to_bytes(1, byteorder='little') + pubkey)
     script_sig_length = varint(len(script_sig))
-
     txin_final = txid + vout + script_sig_length + script_sig + sequence
     final_tx = version + txin_count + txin_final + txout_count + txout + locktime
     return final_tx.hex()
@@ -191,7 +178,7 @@ def is_valid_email(address):
     pattern = r"^[^@]+@[^@]+\.[^@]+$"
     return re.match(pattern, address) is not None
 
-# Registration Route: Generates wallet, secret code, and renders a success page.
+# Registration Route
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
@@ -218,7 +205,7 @@ def register():
         return render_template('register_success.html', secret_code=secret_code)
     return render_template('register.html')
 
-# Check Balance Route – now explicitly given the endpoint "wallet_balance"
+# Check Balance Route – explicitly given the endpoint "wallet_balance"
 @app.route('/check_balance', methods=['GET', 'POST'], endpoint="wallet_balance")
 def check_balance():
     address_to_check = request.form.get('address')
@@ -250,7 +237,6 @@ def check_balance():
     except Exception as e:
         return render_template('check_balance.html', error=str(e), address=address_to_check)
 
-# Login Route with secret code and 2FA check
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -269,7 +255,6 @@ def login():
             flash("Invalid credentials or secret code, please try again.", "error")
     return render_template('login.html')
 
-# Two-Factor Authentication Verification Route
 @app.route('/two_factor_auth', methods=['GET', 'POST'])
 def two_factor_auth():
     pending_user_id = session.get('pending_2fa_user_id')
@@ -285,11 +270,17 @@ def two_factor_auth():
             return redirect(url_for('index'))
         else:
             flash("Invalid 2FA code, please try again.", "error")
-            # Instead of redirecting, re-render the two_factor_auth page so the flash message appears here.
             return render_template('two_factor_auth.html')
     return render_template('two_factor_auth.html')
 
-# Enable 2FA Route
+# Page that shows two big buttons: Enable / Disable 2FA (options page)
+@app.route('/two_factor')
+def two_factor():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    return render_template('two_factor_options.html')
+
+# Enable 2FA Route – updated to redirect to show_qr_code
 @app.route('/enable_2fa', methods=['GET', 'POST'])
 def enable_2fa():
     if 'user_id' not in session:
@@ -298,10 +289,24 @@ def enable_2fa():
     if request.method == 'POST':
         user.totp_secret = pyotp.random_base32()
         db.session.commit()
-        return redirect(url_for('show_qr_code'))
+        flash("Two-Factor Authentication has been enabled. Please scan the QR code.", "success")
+        return redirect(url_for('show_qr_code'))  # Redirect to QR code page
     return render_template('enable_2fa.html')
 
-# Show QR Code Route for 2FA
+# Disable 2FA Route remains the same
+@app.route('/disable_2fa', methods=['GET', 'POST'])
+def disable_2fa():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    user = User.query.get(session['user_id'])
+    if request.method == 'POST':
+        user.totp_secret = None
+        db.session.commit()
+        flash("Two-Factor Authentication has been disabled.", "success")
+        return redirect(url_for('two_factor'))
+    return render_template('disable_2fa.html')
+
+# Show QR Code Route
 @app.route('/show_qr_code')
 def show_qr_code():
     if 'user_id' not in session:

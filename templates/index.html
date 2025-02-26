@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Bharat Vault : The Crypto Wallet</title>
   <style>
     body {
@@ -29,35 +28,37 @@
       align-items: center;
       margin-top: 40px;
     }
-    /* All main button links have a fixed width for uniformity */
-    .button-link {
+    /* Base style for large green buttons */
+    .big-button {
       background-color: #4CAF50;
       color: white;
-      text-decoration: none;
       padding: 15px 30px;
-      margin: 10px;
+      margin: 10px 0;  /* uniform vertical spacing */
       border-radius: 5px;
       font-size: 18px;
-      width: 300px; /* Uniform width for main links */
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      width: 300px;    /* all large buttons share this width */
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      text-decoration: none;
+      text-align: center;
       transition: background-color 0.3s;
       display: inline-block;
+      border: none;
+      cursor: pointer;
     }
-    .button-link:hover {
+    .big-button:hover {
       background-color: #45a049;
     }
-    /* Logout button now sizes based on padding only */
+    /* Logout button: smaller, red, no fixed width */
     .logout-btn {
       background-color: red;
       color: white;
-      padding: 15px 30px;
+      padding: 10px 25px;
       font-size: 18px;
       border: none;
       border-radius: 5px;
       cursor: pointer;
       margin-top: 20px;
       transition: background-color 0.3s;
-      /* No fixed width here so it appears smaller */
     }
     .logout-btn:hover {
       background-color: #cc0000;
@@ -70,27 +71,26 @@
       color: white;
       padding: 10px;
       text-align: center;
+      font-size: 16px;
     }
   </style>
 </head>
 <body>
-  <header>
-    Bharat Vault : The Crypto Wallet
-  </header>
+  <header>Bharat Vault : The Crypto Wallet</header>
   <h1>Welcome, {{ user.username }}</h1>
   <div class="container">
-    <a href="{{ url_for('create_wallet_route') }}" class="button-link">Create Wallet</a>
-    <a href="{{ url_for('send_litecoin') }}" class="button-link">Send Litecoin</a>
-    <a href="{{ url_for('wallet_balance') }}" class="button-link">Check Wallet Balance</a>
-    <a href="{{ url_for('history') }}" class="button-link">Transaction History</a>
-    <!-- New Enable 2FA button below Transaction History -->
-    <a href="{{ url_for('enable_2fa') }}" class="button-link">Enable Two-Factor Authentication</a>
+    <!-- Five main large buttons -->
+    <a href="{{ url_for('create_wallet_route') }}" class="big-button">Create Wallet</a>
+    <a href="{{ url_for('send_litecoin') }}" class="big-button">Send Litecoin</a>
+    <a href="{{ url_for('wallet_balance') }}" class="big-button">Check Wallet Balance</a>
+    <a href="{{ url_for('history') }}" class="big-button">Transaction History</a>
+    <a href="{{ url_for('two_factor') }}" class="big-button">Two-Factor Authentication</a>
+
+    <!-- Logout button remains smaller -->
     <a href="{{ url_for('logout') }}">
       <button class="logout-btn">Logout</button>
     </a>
   </div>
-  <footer>
-    &copy; 2025 Bharat Vault : The Crypto Wallet
-  </footer>
+  <footer>&copy; 2025 Bharat Vault : The Crypto Wallet</footer>
 </body>
 </html>

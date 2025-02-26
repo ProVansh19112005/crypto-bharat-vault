@@ -40,9 +40,9 @@
         }
         .form-input {
             width: 100%;
-            padding: 12px 25px; /* same horizontal padding as button */
+            padding: 12px;
             margin: 12px 0;
-            font-size: 16px;    /* same font-size as button */
+            font-size: 14px;
             border: 1px solid #ccc;
             border-radius: 5px;
             text-align: center;
@@ -85,6 +85,11 @@
             background-color: #dc3545;
             color: white;
         }
+        .note {
+            font-size: 12px;
+            color: #555;
+            margin-top: 15px;
+        }
         .footer {
             position: fixed;
             bottom: 0;
@@ -120,8 +125,9 @@
 
         {% if balance is not none %}
             <h3>Balance for Address: {{ address }}</h3>
-            <p>Confirmed Balance: <strong>{{ balance }} LTC ( {{ balance_inr|default(0)|round(2) }} INR )</strong></p>
-            <p>Unconfirmed Balance: <strong>{{ unconfirmed_balance }} LTC ( {{ unconfirmed_inr|default(0)|round(2) }} INR )</strong></p>
+            <p>Confirmed Balance: <strong>{{ balance }} LTC ({{ balance_inr|default(0)|round(2) }} INR)</strong></p>
+            <p>Unconfirmed Balance: <strong>{{ unconfirmed_balance }} LTC ({{ unconfirmed_inr|default(0)|round(2) }} INR)</strong></p>
+            <p class="note">If confirmed and unconfirmed balance is same, the transaction cannot be reversed but funds are not ready yet to be sent.</p>
             <a href="/" class="go-back">Go Back to Dashboard</a>
         {% endif %}
     </div>

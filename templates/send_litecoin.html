@@ -6,7 +6,7 @@
   <title>Bharat Vault : Send Litecoin</title>
   <style>
     body {
-      font-family: 'Arial', sans-serif;
+      font-family: Arial, sans-serif;
       background: #f7f7f7;
       margin: 0;
       padding: 0;
@@ -17,98 +17,128 @@
       color: white;
       padding: 20px 0;
       font-size: 24px;
-    }
-    .flash-messages {
-      margin: 20px auto;
-      width: 70%;
-      max-width: 300px;
-      text-align: left;
-      padding: 10px;
-    }
-    .flash-message {
-      margin-bottom: 10px;
-      padding: 10px;
-      border-radius: 5px;
-      font-size: 14px;
-    }
-    .flash-message.error {
-      background-color: #f8d7da;
-      color: #721c24;
-    }
-    .flash-message.success {
-      background-color: #d4edda;
-      color: #155724;
+      width: 100%;
     }
     .container {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      margin-top: 50px;
+      margin: 50px auto;
+      padding: 20px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      width: 60%;
+      max-width: 500px;
+    }
+    .form-label {
+      font-size: 14px;
+      font-weight: bold;
+      margin-bottom: 12px;
+      display: block;
     }
     .form-input {
-      padding: 10px;
-      margin: 10px;
-      width: 70%;
-      max-width: 300px;
-      font-size: 16px;
+      width: 100%;
+      padding: 12px;
+      margin: 12px 0;
+      font-size: 14px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      text-align: center;
+      box-sizing: border-box;
     }
     .form-button {
       background-color: #4CAF50;
       color: white;
-      padding: 15px 30px;
-      margin-top: 20px;
+      padding: 12px 25px;
       border: none;
       border-radius: 5px;
-      font-size: 18px;
-      width: 70%;
-      max-width: 300px;
+      font-size: 16px;
       cursor: pointer;
+      width: 100%;
       transition: background-color 0.3s;
     }
     .form-button:hover {
       background-color: #45a049;
     }
+    .inr-display {
+      font-size: 16px;
+      margin: 10px 0;
+      font-weight: bold;
+      color: #333;
+      background-color: #eef;
+      padding: 10px;
+      border-radius: 5px;
+    }
+    .go-back {
+      display: inline-block;
+      margin-top: 18px;
+      padding: 8px 16px;
+      background-color: #007bff;
+      color: white;
+      border-radius: 5px;
+      text-decoration: none;
+    }
+    .go-back:hover {
+      background-color: #0056b3;
+    }
     .footer {
       position: fixed;
       bottom: 0;
-      width: 100%;
+      left: 0;
+      right: 0;
       background-color: #333;
       color: white;
       padding: 10px;
       text-align: center;
+      font-size: 16px;
     }
   </style>
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      let conversionRate = 0;
+      const ltcInput = document.getElementById("ltcAmount");
+      const inrDisplay = document.getElementById("inrDisplay");
+
+      // Set default display
+      inrDisplay.textContent = "Equivalent: 0.00 INR";
+
+      // Fetch conversion rate from CoinGecko
+      fetch("https://api.coingecko.com/api/v3/simple/price?ids=litecoin&vs_currencies=inr")
+        .then(response => response.json())
+        .then(data => {
+          conversionRate = data.litecoin.inr;
+          updateInr();
+        })
+        .catch(error => {
+          console.error("Error fetching conversion rate:", error);
+        });
+
+      function updateInr() {
+        const ltcAmount = parseFloat(ltcInput.value);
+        if (!isNaN(ltcAmount) && ltcAmount > 0 && conversionRate !== 0) {
+          const inrAmount = ltcAmount * conversionRate;
+          inrDisplay.textContent = "Equivalent: " + inrAmount.toFixed(2) + " INR";
+        } else {
+          inrDisplay.textContent = "Equivalent: 0.00 INR";
+        }
+      }
+
+      ltcInput.addEventListener("input", updateInr);
+    });
+  </script>
 </head>
 <body>
-  <header>
-    Bharat Vault : Send Litecoin
-  </header>
-
-  <!-- Flash messages block to display errors or success messages -->
-  {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-      <div class="flash-messages">
-        {% for category, message in messages %}
-          <div class="flash-message {{ category }}">{{ message }}</div>
-        {% endfor %}
-      </div>
-    {% endif %}
-  {% endwith %}
-
-  <h2>Send Litecoin</h2>
-
+  <header>Bharat Vault : Send Litecoin</header>
   <div class="container">
+    <h2>Send Litecoin</h2>
     <form method="POST">
-      <!-- Recipient Litecoin Address -->
-      <input type="text" name="recipient_address" class="form-input" placeholder="Recipient Litecoin Address" required>
-      <!-- Amount (LTC) with a step allowing LTC fractions -->
-      <input type="number" name="amount" step="0.00000001" class="form-input" placeholder="Amount (LTC)" required>
-      <button type="submit" class="form-button">Send Litecoin</button>
+      <label for="recipient_address" class="form-label">Recipient Litecoin Address:</label>
+      <input type="text" name="recipient_address" id="recipient_address" placeholder="Enter recipient address" class="form-input" required>
+      <label for="ltcAmount" class="form-label">Amount (in LTC):</label>
+      <input type="number" step="0.00000001" name="amount" id="ltcAmount" placeholder="Enter LTC amount" class="form-input" required>
+      <div class="inr-display" id="inrDisplay"></div>
+      <input type="submit" value="Send Litecoin" class="form-button">
     </form>
-    <p><a href="/index" style="color: #4CAF50;">Go back to home</a></p>
+    <p><a href="/" class="go-back">Go back to home</a></p>
   </div>
-
   <div class="footer">
     &copy; 2025 Bharat Vault : The Crypto Wallet
   </div>
