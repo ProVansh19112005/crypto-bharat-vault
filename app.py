@@ -289,7 +289,6 @@ def enable_2fa():
     if request.method == 'POST':
         user.totp_secret = pyotp.random_base32()
         db.session.commit()
-        flash("Two-Factor Authentication has been enabled. Please scan the QR code.", "success")
         return redirect(url_for('show_qr_code'))  # Redirect to QR code page
     return render_template('enable_2fa.html')
 
