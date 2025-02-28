@@ -9,18 +9,38 @@
       background: #f7f7f7;
       margin: 0;
       padding: 0;
+      padding-bottom: 100px; /* Extra space for footer */
       text-align: center;
     }
     header {
+      position: relative;
       background-color: #333;
-      color: white;
       padding: 20px 0;
-      font-size: 24px;
     }
-    h1 {
+    header h1 {
+      margin: 0;
+      color: white;
+      font-size: 24px;
+      text-align: center;
+    }
+    /* FAQ link positioned at top-right without disturbing centered header */
+    .faq-link {
+      position: absolute;
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: white;
+      text-decoration: none;
+      font-size: 16px;
+    }
+    .faq-link:hover {
+      text-decoration: underline;
+    }
+    h2 {
       margin: 20px 0;
       color: #4CAF50;
       font-size: 36px;
+      text-align: center;
     }
     .container {
       display: flex;
@@ -33,22 +53,19 @@
       background-color: #4CAF50;
       color: white;
       padding: 15px 30px;
-      margin: 10px 0;  /* uniform vertical spacing */
+      margin: 10px 0;
       border-radius: 5px;
       font-size: 18px;
-      width: 300px;    /* all large buttons share this width */
+      width: 300px;
       box-shadow: 0 4px 8px rgba(0,0,0,0.1);
       text-decoration: none;
-      text-align: center;
       transition: background-color 0.3s;
       display: inline-block;
-      border: none;
-      cursor: pointer;
     }
     .big-button:hover {
       background-color: #45a049;
     }
-    /* Logout button: smaller, red, no fixed width */
+    /* Logout button: smaller, red */
     .logout-btn {
       background-color: red;
       color: white;
@@ -63,6 +80,18 @@
     .logout-btn:hover {
       background-color: #cc0000;
     }
+    .support {
+      margin-top: 20px;
+      font-size: 16px;
+      color: #333;
+    }
+    .support a {
+      color: #4CAF50;
+      text-decoration: none;
+    }
+    .support a:hover {
+      text-decoration: underline;
+    }
     footer {
       position: fixed;
       bottom: 0;
@@ -70,26 +99,35 @@
       background-color: #333;
       color: white;
       padding: 10px;
-      text-align: center;
       font-size: 16px;
+      text-align: center;
     }
   </style>
 </head>
 <body>
-  <header>Bharat Vault : The Crypto Wallet</header>
-  <h1>Welcome, {{ user.username }}</h1>
+  <header>
+    <h1>Bharat Vault : The Crypto Wallet</h1>
+    <a href="{{ url_for('faq2') }}" class="faq-link">FAQ</a>
+  </header>
+  <h2>Welcome, {{ user.username }}</h2>
   <div class="container">
-    <!-- Five main large buttons -->
+    <!-- Dashboard Buttons -->
     <a href="{{ url_for('create_wallet_route') }}" class="big-button">Create Wallet</a>
     <a href="{{ url_for('send_litecoin') }}" class="big-button">Send Litecoin</a>
     <a href="{{ url_for('wallet_balance') }}" class="big-button">Check Wallet Balance</a>
     <a href="{{ url_for('history') }}" class="big-button">Transaction History</a>
     <a href="{{ url_for('two_factor') }}" class="big-button">Two-Factor Authentication</a>
-
-    <!-- Logout button remains smaller -->
+    
+    <!-- Logout Button -->
     <a href="{{ url_for('logout') }}">
       <button class="logout-btn">Logout</button>
     </a>
+    
+    <!-- Support Message -->
+    <p class="support">
+      If you face any issues, kindly contact our support team via 
+      <a href="https://mail.google.com/mail/?view=cm&fs=1&to=bharatvault.help@gmail.com" target="_blank">bharatvault.help@gmail.com</a> 😊
+    </p>
   </div>
   <footer>&copy; 2025 Bharat Vault : The Crypto Wallet</footer>
 </body>

@@ -2,44 +2,43 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>FAQ - Bharat Vault : The Crypto Wallet</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bharat Vault : FAQ</title>
   <style>
-    /* Global Styles */
     body {
       font-family: Arial, sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
+      background: #f7f7f7;
       margin: 0;
-      /* Indian flag stripes: saffron, white, green, white */
-      background: linear-gradient(to bottom, #FF9933 0%, #FFFFFF 33%, #138808 67%, #FFFFFF 100%);
-      background-size: 100% 100%;
-      position: relative;
-      color: #333;
-    }
-    
-    /* Main container */
-    .container {
-      max-width: 800px;
-      width: 100%;
-      margin: 40px;
-      background: rgba(255, 255, 255, 0.95);
-      padding: 30px;
-      border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      z-index: 2;
-    }
-    
-    /* FAQ heading */
-    h1 {
+      padding: 0;
       text-align: center;
-      margin-bottom: 30px;
+      padding-bottom: 100px; /* Extra space for footer */
+    }
+    header {
+      background-color: #333;
+      color: white;
+      padding: 20px 0;
+      font-size: 24px;
+    }
+    h1 {
+      margin: 20px 0;
+      color: #4CAF50;
       font-size: 36px;
     }
-    
-    /* FAQ accordion items */
+    .faq-container {
+      max-width: 800px;
+      width: 90%;
+      background: #fff;
+      margin: 40px auto;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      text-align: left;
+    }
+    .faq-container h2 {
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 32px;
+      color: #4CAF50;
+    }
     .faq-item {
       margin-bottom: 20px;
       border-bottom: 1px solid #ddd;
@@ -48,8 +47,6 @@
     .faq-item:last-child {
       border-bottom: none;
     }
-    
-    /* FAQ question button with dropdown arrow */
     .faq-question {
       background-color: #f1f1f1;
       color: #222;
@@ -77,8 +74,6 @@
     .faq-question.active .arrow {
       transform: translateY(-50%) rotate(180deg);
     }
-    
-    /* FAQ answer content */
     .faq-answer {
       display: none;
       padding: 0 15px 15px;
@@ -86,32 +81,37 @@
       line-height: 1.5;
       color: #555;
     }
-    
-    /* Back button */
     .back-button {
       display: block;
       text-align: center;
-      margin-top: 30px;
-      text-decoration: none;
-      background-color: #000;
-      color: #fff;
-      padding: 10px 20px;
+      margin: 20px auto;
+      background-color: #4CAF50;
+      color: white;
+      padding: 15px 30px;
       border-radius: 5px;
+      font-size: 18px;
       width: 200px;
-      margin-left: auto;
-      margin-right: auto;
+      text-decoration: none;
       transition: background-color 0.3s;
     }
     .back-button:hover {
+      background-color: #45a049;
+    }
+    footer {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
       background-color: #333;
+      color: white;
+      padding: 10px;
+      text-align: center;
+      font-size: 16px;
     }
   </style>
 </head>
 <body>
-
-  <div class="container">
-    <h1>Frequently Asked Questions</h1>
-    
+  <header>Bharat Vault : The Crypto Wallet</header>
+  <div class="faq-container">
     <div class="faq-item">
       <button class="faq-question">
         What is Bharat Vault?
@@ -121,17 +121,15 @@
         <p>Bharat Vault is a secure crypto wallet designed to help you manage and send Litecoin safely and efficiently.</p>
       </div>
     </div>
-    
     <div class="faq-item">
       <button class="faq-question">
         How do I create a wallet?
         <span class="arrow">&#9662;</span>
       </button>
       <div class="faq-answer">
-        <p>Simply click the "Create Wallet" button on the homepage and follow the step-by-step instructions to set up your wallet securely.</p>
+        <p>Simply click the "Create Wallet" button on the dashboard and follow the step-by-step instructions to set up your wallet securely.</p>
       </div>
     </div>
-    
     <div class="faq-item">
       <button class="faq-question">
         How can I send Litecoin?
@@ -141,7 +139,6 @@
         <p>After setting up your wallet, navigate to the "Send Litecoin" section, enter the recipient's address and amount, and confirm your transaction.</p>
       </div>
     </div>
-    
     <div class="faq-item">
       <button class="faq-question">
         How secure is my data?
@@ -151,36 +148,33 @@
         <p>Your security is our top priority. We use advanced encryption and two-factor authentication to ensure that your data and funds remain safe.</p>
       </div>
     </div>
-    
     <div class="faq-item">
       <button class="faq-question">
         What if I forget my password?
         <span class="arrow">&#9662;</span>
       </button>
       <div class="faq-answer">
-        <p>If you forget your password, kindly contact our support team via <a href="https://mail.google.com/mail/?view=cm&fs=1&to=bharatvault.help@gmail.com" target="_blank">bharatvault.help@gmail.com</a>. For security reasons, we cannot retrieve your password, but we can help with account recovery. We typically reply within 24 hours. 
-          😊</p>
+        <p>If you forget your password, kindly contact our support team via 
+          <a href="https://mail.google.com/mail/?view=cm&fs=1&to=bharatvault.help@gmail.com" target="_blank">bharatvault.help@gmail.com</a>.
+          For security reasons, we cannot retrieve your password, but we can help with account recovery.
+        </p>
       </div>
     </div>
-    
-    <a href="{{ url_for('intro') }}" class="back-button">Go Back</a>
+    <!-- Back to Dashboard button -->
+    <a href="{{ url_for('index') }}" class="back-button">Back to Dashboard</a>
   </div>
+  <footer>&copy; 2025 Bharat Vault : The Crypto Wallet</footer>
   
   <script>
-    // Add dropdown functionality to all FAQ questions with arrow toggle
+    // FAQ dropdown functionality
     const faqQuestions = document.querySelectorAll('.faq-question');
     faqQuestions.forEach(question => {
       question.addEventListener('click', () => {
         question.classList.toggle('active');
         const answer = question.nextElementSibling;
-        if (answer.style.display === "block") {
-          answer.style.display = "none";
-        } else {
-          answer.style.display = "block";
-        }
+        answer.style.display = (answer.style.display === "block") ? "none" : "block";
       });
     });
   </script>
-  
 </body>
 </html>

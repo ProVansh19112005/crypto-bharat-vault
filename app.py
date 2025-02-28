@@ -329,6 +329,10 @@ def show_qr_code():
 def faq():
     return render_template('faq.html')
 
+@app.route('/faq2')
+def faq2():
+    return render_template('faq2.html')    
+
 @app.route('/logout')
 def logout():
     session.pop('user_id', None)
