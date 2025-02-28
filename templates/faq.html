@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>FAQ - Bharat Vault : The Crypto Wallet</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    /* Global Styles */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(
+        to bottom, 
+        #FF9933 0%,    /* saffron */
+        #FFFFFF 33%,   /* white */
+        #138808 67%,   /* green */
+        #FFFFFF 100%   /* white */
+      );
+      background-size: 100% 100%;
+      color: #333;
+    }
+    
+    /* Header */
+    header {
+      background-color: #333;
+      color: #fff;
+      padding: 20px;
+      text-align: center;
+      font-size: 24px;
+    }
+    
+    /* Main container */
+    .container {
+      max-width: 800px;
+      margin: 40px auto;
+      background: rgba(255, 255, 255, 0.95);
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* FAQ heading */
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 32px;
+    }
+    
+    /* FAQ accordion items */
+    .faq-item {
+      margin-bottom: 20px;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 10px;
+    }
+    .faq-item:last-child {
+      border-bottom: none;
+    }
+    
+    /* FAQ question button with dropdown arrow */
+    .faq-question {
+      background-color: #f1f1f1;
+      color: #222;
+      cursor: pointer;
+      padding: 15px;
+      width: 100%;
+      text-align: left;
+      border: none;
+      outline: none;
+      font-size: 18px;
+      transition: background-color 0.3s;
+      position: relative;
+    }
+    .faq-question:hover {
+      background-color: #ddd;
+    }
+    .faq-question .arrow {
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      transition: transform 0.3s ease;
+      font-size: 20px; /* Increased arrow size */
+    }
+    .faq-question.active .arrow {
+      transform: translateY(-50%) rotate(180deg);
+    }
+    
+    /* FAQ answer content */
+    .faq-answer {
+      display: none;
+      padding: 0 15px 15px;
+      font-size: 16px;
+      line-height: 1.5;
+      color: #555;
+    }
+    
+    /* Back button */
+    .back-button {
+      display: block;
+      text-align: center;
+      margin-top: 30px;
+      text-decoration: none;
+      background-color: #000;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 5px;
+      width: 160px;
+      margin-left: auto;
+      margin-right: auto;
+      transition: background-color 0.3s;
+    }
+    .back-button:hover {
+      background-color: #333;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    Bharat Vault : The Crypto Wallet - FAQ
+  </header>
+  
+  <div class="container">
+    <h1>Frequently Asked Questions</h1>
+    
+    <div class="faq-item">
+      <button class="faq-question">
+        What is Bharat Vault?
+        <span class="arrow">&#9662;</span>
+      </button>
+      <div class="faq-answer">
+        <p>Bharat Vault is a secure crypto wallet designed to help you manage and send Litecoin safely and efficiently.</p>
+      </div>
+    </div>
+    
+    <div class="faq-item">
+      <button class="faq-question">
+        How do I create a wallet?
+        <span class="arrow">&#9662;</span>
+      </button>
+      <div class="faq-answer">
+        <p>Simply click the "Create Wallet" button on the homepage and follow the step-by-step instructions to set up your wallet securely.</p>
+      </div>
+    </div>
+    
+    <!-- Moved "How can I send Litecoin?" to come before "How secure is my data?" -->
+    <div class="faq-item">
+      <button class="faq-question">
+        How can I send Litecoin?
+        <span class="arrow">&#9662;</span>
+      </button>
+      <div class="faq-answer">
+        <p>After setting up your wallet, navigate to the "Send Litecoin" section, enter the recipient's address and amount, and confirm your transaction.</p>
+      </div>
+    </div>
+    
+    <div class="faq-item">
+      <button class="faq-question">
+        How secure is my data?
+        <span class="arrow">&#9662;</span>
+      </button>
+      <div class="faq-answer">
+        <p>Your security is our top priority. We use advanced encryption and two-factor authentication to ensure that your data and funds remain safe.</p>
+      </div>
+    </div>
+    
+    <div class="faq-item">
+      <button class="faq-question">
+        What if I forget my password?
+        <span class="arrow">&#9662;</span>
+      </button>
+      <div class="faq-answer">
+        <p>If you forget your password, please contact our support team immediately. For security reasons, we cannot retrieve your password, but we can help with account recovery.</p>
+      </div>
+    </div>
+    
+    <a href="{{ url_for('login') }}" class="back-button">Back to Login</a>
+  </div>
+  
+  <script>
+    // Add dropdown functionality to all FAQ questions with arrow toggle
+    const faqQuestions = document.querySelectorAll('.faq-question');
+    faqQuestions.forEach(question => {
+      question.addEventListener('click', () => {
+        // Toggle the active class to rotate the arrow
+        question.classList.toggle('active');
+        const answer = question.nextElementSibling;
+        if (answer.style.display === "block") {
+          answer.style.display = "none";
+        } else {
+          answer.style.display = "block";
+        }
+      });
+    });
+  </script>
+  
+</body>
+</html>

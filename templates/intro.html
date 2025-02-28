@@ -16,12 +16,34 @@
       /* Indian flag stripes: saffron, white, green */
       background: linear-gradient(to bottom, #FF9933 0%, #FFFFFF 33%, #138808 67%, #FFFFFF 100%);
       background-size: 100% 100%;
+      position: relative; /* For positioning the header */
+    }
+
+    /* Navigation Header */
+    .nav-header {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+    }
+    .faq-link {
+      color: #000;
+      text-decoration: none;
+      font-size: 16px;
+      font-weight: bold;
+      background: rgba(255, 255, 255, 0.7);
+      padding: 8px 12px;
+      border-radius: 5px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      transition: background 0.3s;
+    }
+    .faq-link:hover {
+      background: rgba(255, 255, 255, 0.9);
     }
 
     /* Container: center content above background */
     .container {
       text-align: center;
-      z-index: 2; /* Ensures the content is above the background */
+      z-index: 2;
     }
 
     /* Logo: large size, maintain aspect ratio */
@@ -34,7 +56,7 @@
     /* Headings and paragraph text */
     h1 {
       font-size: 36px;
-      color: #222; /* Darker shade for the title */
+      color: #222;
     }
     p {
       font-size: 20px;
@@ -63,6 +85,11 @@
   </style>
 </head>
 <body>
+
+  <!-- Header navigation with FAQ button -->
+  <header class="nav-header">
+    <a href="{{ url_for('faq') }}" class="faq-link">FAQ</a>
+  </header>
 
   <div class="container">
     <!-- Logo -->

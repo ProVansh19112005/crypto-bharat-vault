@@ -325,6 +325,10 @@ def show_qr_code():
     img_str = base64.b64encode(buffered.getvalue()).decode()
     return render_template('show_qr_code.html', qr_code=img_str)
 
+@app.route('/faq')
+def faq():
+    return render_template('faq.html')
+
 @app.route('/logout')
 def logout():
     session.pop('user_id', None)
