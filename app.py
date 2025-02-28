@@ -333,6 +333,10 @@ def faq():
 def faq2():
     return render_template('faq2.html')    
 
+@app.route('/about')
+def about():
+    return render_template('about.html')     
+
 @app.route('/logout')
 def logout():
     session.pop('user_id', None)

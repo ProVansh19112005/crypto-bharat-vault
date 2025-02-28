@@ -23,7 +23,20 @@
       font-size: 24px;
       text-align: center;
     }
-    /* FAQ link positioned at top-right without disturbing centered header */
+    /* About Us link on the left */
+    .about-link {
+      position: absolute;
+      left: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: white;
+      text-decoration: none;
+      font-size: 16px;
+    }
+    .about-link:hover {
+      text-decoration: underline;
+    }
+    /* FAQ link on the right */
     .faq-link {
       position: absolute;
       right: 20px;
@@ -106,6 +119,7 @@
 </head>
 <body>
   <header>
+    <a href="{{ url_for('about') }}" class="about-link">About Us</a>
     <h1>Bharat Vault : The Crypto Wallet</h1>
     <a href="{{ url_for('faq2') }}" class="faq-link">FAQ</a>
   </header>
