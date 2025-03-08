@@ -5,7 +5,6 @@
   <title>Welcome to Bharat Vault : The Crypto Wallet</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    /* Body: Indian flag gradient background */
     body {
       font-family: Arial, sans-serif;
       display: flex;
@@ -13,13 +12,11 @@
       align-items: center;
       height: 100vh;
       margin: 0;
-      /* Indian flag stripes: saffron, white, green */
       background: linear-gradient(to bottom, #FF9933 0%, #FFFFFF 33%, #138808 67%, #FFFFFF 100%);
       background-size: 100% 100%;
-      position: relative; /* For positioning the header */
+      position: relative; 
     }
 
-    /* Navigation Header */
     .nav-header {
       position: absolute;
       top: 20px;
@@ -40,20 +37,17 @@
       background: rgba(255, 255, 255, 0.9);
     }
 
-    /* Container: center content above background */
     .container {
       text-align: center;
       z-index: 2;
     }
 
-    /* Logo: large size, maintain aspect ratio */
     .logo {
       width: 300px;
       height: auto;
       margin-bottom: 20px;
     }
 
-    /* Headings and paragraph text */
     h1 {
       font-size: 36px;
       color: #222;
@@ -65,7 +59,6 @@
       margin-bottom: 30px;
     }
 
-    /* Black button */
     .button {
       padding: 12px 30px;
       background-color: #000;
@@ -85,21 +78,16 @@
   </style>
 </head>
 <body>
-
-  <!-- Header navigation with FAQ button -->
   <header class="nav-header">
     <a href="{{ url_for('faq') }}" class="faq-link">FAQ</a>
   </header>
 
   <div class="container">
-    <!-- Logo -->
     <img src="{{ url_for('static', filename='logo.png') }}" alt="Bharat Vault Logo" class="logo">
 
-    <!-- Main heading and subtext -->
     <h1>Welcome to Bharat Vault : The Crypto Wallet</h1>
     <p>Your gateway to managing and sending Litecoin securely!</p>
 
-    <!-- Continue button linking to the login page -->
     <a href="{{ url_for('login') }}">
       <button class="button">Continue</button>
     </a>

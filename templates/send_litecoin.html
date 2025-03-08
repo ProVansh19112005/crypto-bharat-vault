@@ -97,10 +97,8 @@
       const ltcInput = document.getElementById("ltcAmount");
       const inrDisplay = document.getElementById("inrDisplay");
 
-      // Set default display
       inrDisplay.textContent = "Equivalent: 0.00 INR";
 
-      // Fetch conversion rate from CoinGecko
       fetch("https://api.coingecko.com/api/v3/simple/price?ids=litecoin&vs_currencies=inr")
         .then(response => response.json())
         .then(data => {

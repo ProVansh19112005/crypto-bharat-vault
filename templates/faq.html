@@ -5,7 +5,6 @@
   <title>FAQ - Bharat Vault : The Crypto Wallet</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    /* Global Styles */
     body {
       font-family: Arial, sans-serif;
       display: flex;
@@ -13,14 +12,11 @@
       align-items: center;
       height: 100vh;
       margin: 0;
-      /* Indian flag stripes: saffron, white, green, white */
       background: linear-gradient(to bottom, #FF9933 0%, #FFFFFF 33%, #138808 67%, #FFFFFF 100%);
       background-size: 100% 100%;
       position: relative;
       color: #333;
     }
-    
-    /* Main container */
     .container {
       max-width: 800px;
       width: 100%;
@@ -31,15 +27,11 @@
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
       z-index: 2;
     }
-    
-    /* FAQ heading */
     h1 {
       text-align: center;
       margin-bottom: 30px;
       font-size: 36px;
     }
-    
-    /* FAQ accordion items */
     .faq-item {
       margin-bottom: 20px;
       border-bottom: 1px solid #ddd;
@@ -48,8 +40,6 @@
     .faq-item:last-child {
       border-bottom: none;
     }
-    
-    /* FAQ question button with dropdown arrow */
     .faq-question {
       background-color: #f1f1f1;
       color: #222;
@@ -77,8 +67,6 @@
     .faq-question.active .arrow {
       transform: translateY(-50%) rotate(180deg);
     }
-    
-    /* FAQ answer content */
     .faq-answer {
       display: none;
       padding: 0 15px 15px;
@@ -87,7 +75,6 @@
       color: #555;
     }
     
-    /* Back button */
     .back-button {
       display: block;
       text-align: center;
@@ -167,7 +154,6 @@
   </div>
   
   <script>
-    // Add dropdown functionality to all FAQ questions with arrow toggle
     const faqQuestions = document.querySelectorAll('.faq-question');
     faqQuestions.forEach(question => {
       question.addEventListener('click', () => {

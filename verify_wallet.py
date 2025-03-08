@@ -3,21 +3,17 @@ import base58
 import ecdsa
 from bitcoinlib.keys import HDKey
 
-# Your generated extended HD private key (from your wallet generation)
 hd_private_key_str = "Ltpv7CM6xSY7X1WxejbstLhUga5uW3txJSvSA3PsxfDk3Ef1y3q1eqNPz1S4qtBtC9VpAV5Uh8wnAMsoDykWnafMg5G8zAWoFWEmKWSp4mq3pS9"
 expected_address = "LdULDueQzRbr97qjLHMNFzrsRqQrwB9FpL"
 
 try:
-    # Instantiate the HDKey directly with the key string and network.
     hd_key = HDKey(hd_private_key_str, network='litecoin')
 except Exception as e:
     print("Error creating HDKey:", e)
     exit(1)
 
-# Display some HD key info for debugging (like its depth)
 print("HD Key depth:", hd_key.depth)
 
-# Extract the raw 32-byte private key from the HD key
 raw_private_key = hd_key.private_byte
 print("Raw private key (hex):", raw_private_key.hex())
 
@@ -37,7 +33,6 @@ def private_key_to_public_key(private_key, compressed=True):
     else:
         return b'\x04' + vk.to_string()
 
-# Derive the compressed public key
 public_key = private_key_to_public_key(raw_private_key, compressed=True)
 print("Public key (hex):", public_key.hex())
 
@@ -46,7 +41,7 @@ def public_key_to_litecoin_address(public_key):
     Compute a Litecoin legacy (P2PKH) address from a public key.
     Uses Litecoin's version byte 0x30.
     """
-    version = b'\x30'  # Litecoin P2PKH version byte
+    version = b'\x30' 
     sha256_pk = hashlib.sha256(public_key).digest()
     ripemd160 = hashlib.new('ripemd160', sha256_pk).digest()
     payload = version + ripemd160
@@ -54,7 +49,6 @@ def public_key_to_litecoin_address(public_key):
     address = base58.b58encode(payload + checksum).decode()
     return address
 
-# Compute the address from the public key
 computed_address = public_key_to_litecoin_address(public_key)
 print("Computed Address:", computed_address)
 print("Expected Address:", expected_address)
