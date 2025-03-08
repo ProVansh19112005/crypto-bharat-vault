@@ -9,63 +9,49 @@ from decimal import Decimal
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_session import Session
-from wallet import create_wallet, get_balance  # Your wallet functions
-from bitcoinlib.wallets import Wallet, wallet_delete  # (May be used for wallet creation)
+from wallet import create_wallet, get_balance
+from bitcoinlib.wallets import Wallet, wallet_delete
 import hashlib
 import secrets
 import string
-
-# Import libraries for 2FA
 import pyotp
 import qrcode
 from io import BytesIO
 import base64
 
-# --- Monkey-patch bitcoinlib's DbTransactionOutput if needed ---
 try:
     from bitcoinlib.transactions import DbTransactionOutput
     if not hasattr(DbTransactionOutput, '_sa_instance_state'):
         DbTransactionOutput._sa_instance_state = property(lambda self: None)
 except Exception:
     pass
-# --- End monkey-patch ---
 
 app = Flask(__name__)
 
-# Configure Database for Flask models using an absolute path
 basedir = os.path.abspath(os.path.dirname(__file__))
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///' + os.path.join(basedir, 'database.db'))
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# Configure Session
 app.config['SESSION_TYPE'] = 'filesystem'
 app.config['SESSION_PERMANENT'] = False
 app.config['SESSION_USE_SIGNER'] = True
 app.config['SECRET_KEY'] = os.getenv("SECRET_KEY", "fallback-secret-key")
 
-# Initialize Session and Database
 Session(app)
 db = SQLAlchemy(app)
 
-# Define User model (with secret_code and totp_secret fields)
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100), unique=True, nullable=False)
     password = db.Column(db.String(100), nullable=False)
     litecoin_address = db.Column(db.String(100), unique=True, nullable=False)
-    private_key = db.Column(db.String(200), nullable=True)  # Stored WIF
-    secret_code = db.Column(db.String(12), nullable=False)   # 12-letter secret code
-    totp_secret = db.Column(db.String(32), nullable=True)    # TOTP secret for 2FA
+    private_key = db.Column(db.String(200), nullable=True)
+    secret_code = db.Column(db.String(12), nullable=False)
+    totp_secret = db.Column(db.String(32), nullable=True)
 
-# --------------------------
-# Helper: Generate 12-letter Secret Code
-# --------------------------
 def generate_secret_code(length=12):
     return ''.join(secrets.choice(string.ascii_letters) for _ in range(length))
 
-# --------------------------
-# Helper: Validate Litecoin Address
-# --------------------------
 def is_valid_ltc_address(address):
     if (address.startswith("L") or address.startswith("M")) and len(address) == 34:
         return True
@@ -73,9 +59,6 @@ def is_valid_ltc_address(address):
         return True
     return False
 
-# --------------------------
-# Helper: Convert WIF to SigningKey
-# --------------------------
 def wif_to_signing_key(wif):
     decoded = base58.b58decode_check(wif)
     if len(decoded) == 34:
@@ -93,9 +76,6 @@ def wif_to_signing_key(wif):
         raise ValueError(f"Invalid private key length: {len(priv_key_bytes)}; expected 32")
     return SigningKey.from_string(priv_key_bytes, curve=SECP256k1)
 
-# --------------------------------------------------------------------
-# Helper functions for manual transaction construction & signing
-# --------------------------------------------------------------------
 def int_to_little_endian(n, length):
     return n.to_bytes(length, byteorder='little')
 
@@ -160,9 +140,6 @@ def create_signed_transaction(utxo, recipient_address, amount, fee, change_addre
     final_tx = version + txin_count + txin_final + txout_count + txout + locktime
     return final_tx.hex()
 
-# --------------------------
-# Routes
-# --------------------------
 @app.route('/')
 def home():
     if 'user_id' not in session:
@@ -178,7 +155,6 @@ def is_valid_email(address):
     pattern = r"^[^@]+@[^@]+\.[^@]+$"
     return re.match(pattern, address) is not None
 
-# Registration Route
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
@@ -205,7 +181,6 @@ def register():
         return render_template('register_success.html', secret_code=secret_code)
     return render_template('register.html')
 
-# Check Balance Route – explicitly given the endpoint "wallet_balance"
 @app.route('/check_balance', methods=['GET', 'POST'], endpoint="wallet_balance")
 def check_balance():
     address_to_check = request.form.get('address')
@@ -273,14 +248,12 @@ def two_factor_auth():
             return render_template('two_factor_auth.html')
     return render_template('two_factor_auth.html')
 
-# Page that shows two big buttons: Enable / Disable 2FA (options page)
 @app.route('/two_factor')
 def two_factor():
     if 'user_id' not in session:
         return redirect(url_for('login'))
     return render_template('two_factor_options.html')
 
-# Enable 2FA Route – updated to redirect to show_qr_code
 @app.route('/enable_2fa', methods=['GET', 'POST'])
 def enable_2fa():
     if 'user_id' not in session:
@@ -289,10 +262,9 @@ def enable_2fa():
     if request.method == 'POST':
         user.totp_secret = pyotp.random_base32()
         db.session.commit()
-        return redirect(url_for('show_qr_code'))  # Redirect to QR code page
+        return redirect(url_for('show_qr_code'))
     return render_template('enable_2fa.html')
 
-# Disable 2FA Route remains the same
 @app.route('/disable_2fa', methods=['GET', 'POST'])
 def disable_2fa():
     if 'user_id' not in session:
@@ -305,7 +277,6 @@ def disable_2fa():
         return redirect(url_for('two_factor'))
     return render_template('disable_2fa.html')
 
-# Show QR Code Route
 @app.route('/show_qr_code')
 def show_qr_code():
     if 'user_id' not in session:
@@ -331,11 +302,11 @@ def faq():
 
 @app.route('/faq2')
 def faq2():
-    return render_template('faq2.html')    
+    return render_template('faq2.html')
 
 @app.route('/about')
 def about():
-    return render_template('about.html')     
+    return render_template('about.html')
 
 @app.route('/logout')
 def logout():
