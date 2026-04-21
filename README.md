@@ -71,9 +71,8 @@ App runs at `http://localhost:5000`.
 bharat-vault/
 ├── app.py
 ├── wallet/
-│   ├── keygen.py
-│   ├── transactions.py
-│   └── balance.py
+│   ├── wallet.py
+│   ├── verify_wallet.py
 ├── templates/
 ├── static/
 ├── database.db
