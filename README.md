@@ -46,7 +46,7 @@ Registered under the Copyright Act, 1957, Government of India (Certificate No. S
 ### Installation
 
 ```bash
-git clone https://github.com/swayamrthakur/bharat-vault.git
+git clone https://github.com/ProVansh19112005/bharat-vault.git
 cd bharat-vault
 
 python -m venv venv
